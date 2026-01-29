@@ -19,7 +19,7 @@ public class QueryGraphBuilder {
     private final Graph shapesGraph;
     private final Graph stepsGraph;
     private final Graph statesGraph;
-    private final Set<Node> goalStates;
+    private final Set<String> goalStates;
 
     private final Map<String, State> processedStates = new HashMap<>();
     private final Map<String, Step> processedSteps = new HashMap<>();
@@ -35,7 +35,7 @@ public class QueryGraphBuilder {
 
     private static final Node emptyState = NodeFactory.createURI("https://w3id.org/imec/ns/fno-steps#emptyState");
 
-    private QueryGraphBuilder(Graph shapesGraph, Graph stepsGraph, Graph statesGraph, Set<Node> goalStates) {
+    private QueryGraphBuilder(Graph shapesGraph, Graph stepsGraph, Graph statesGraph, Set<String> goalStates) {
         this.shapesGraph = shapesGraph;
         this.stepsGraph = stepsGraph;
         this.statesGraph = statesGraph;
@@ -52,18 +52,17 @@ public class QueryGraphBuilder {
         Graph stepsGraph = RDFDataMgr.loadGraph(stepsPath);
         Graph statesGraph = RDFDataMgr.loadGraph(statesPath);
         // Read the goal states
-        Set<Node> goalStates = readGoalStates(goalStatesPath);
+        Set<String> goalStates = readGoalStates(goalStatesPath);
         return new QueryGraphBuilder(shapesGraph, stepsGraph, statesGraph, goalStates);
     }
 
-    private static Set<Node> readGoalStates(final String goalStatesFile) throws IOException {
-        Set<Node> goalStates = new HashSet<>();
+    private static Set<String> readGoalStates(final String goalStatesFile) throws IOException {
+        Set<String> goalStates = new HashSet<>();
         List<String> lines = Files.readAllLines(Path.of(goalStatesFile), StandardCharsets.UTF_8);
         for (String line : lines) {
             line = line.trim();
             if (!line.isBlank() && !line.startsWith("#")) {
-                Node goalStateNode = NodeFactory.createURI(line);
-                goalStates.add(goalStateNode);
+                goalStates.add(line);
             }
         }
         return goalStates;
@@ -75,25 +74,26 @@ public class QueryGraphBuilder {
         deleteNodesOfType(stepsGraph, containerLevelStepClass);
 
         // first build graph
-        for (Node goalState : goalStates) {
-            processPathsBackwards(goalState, 0);
+        for (String goalStateIri : goalStates) {
+            Node goalState = NodeFactory.createURI(goalStateIri);
+            processPathsBackwards(goalState, true, 0);
         }
 
         // then apply the right operators
-        for (Node goalStateNode : goalStates) {
-            State goalState = processedStates.get(goalStateNode.getURI());
+        for (String goalStateIri : goalStates) {
+            State goalState = processedStates.get(goalStateIri);
             goalState.fixOperator();
+            goalState.pushBackGoalState();
         }
 
         System.out.println("Done!");
     }
 
-    private void processPathsBackwards(final Node currentStateNode, final int stackDepth) {
+    private void processPathsBackwards(final Node currentStateNode, boolean isGoalState, final int stackDepth) {
         int indentation = stackDepth * 2;
         System.out.println(("* currentState = " + currentStateNode.getURI()).indent(indentation));
         String currentStateIRI = currentStateNode.getURI();
-        State currentState = processedStates.computeIfAbsent(currentStateIRI, State::new);
-
+        State currentState = processedStates.computeIfAbsent(currentStateIRI,iri -> new State(iri, isGoalState));
         if (currentStateNode.equals(emptyState)) {
             // done!
             return;
@@ -111,7 +111,7 @@ public class QueryGraphBuilder {
                 String previousStateIRI = previousStateNode.getURI();
                 State previousState = processedStates.computeIfAbsent(previousStateIRI, State::new);
                 previousState.setNextStep(previousStep);
-                processPathsBackwards(previousStateNode, stackDepth + 1);
+                processPathsBackwards(previousStateNode, false, stackDepth + 1);
             }
 
         }

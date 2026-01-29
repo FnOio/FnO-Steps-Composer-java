@@ -8,6 +8,7 @@ public class Step {
     private final String iri;
     private final Set<State> nextStates = new HashSet<>();
     private final Set<State> previousStates = new HashSet<>();
+    private final Set<State> toGoalStates = new HashSet<>();
 
     public Step(String iri) {
         this.iri = iri;
@@ -31,6 +32,13 @@ public class Step {
         }
     }
 
+    void pushBackGoalState(State goalState) {
+        toGoalStates.add(goalState);
+        for (State previousState : previousStates) {
+            previousState.pushBackGoalState(goalState);
+        }
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
@@ -41,5 +49,10 @@ public class Step {
     @Override
     public int hashCode() {
         return Objects.hashCode(iri);
+    }
+
+    @Override
+    public String toString() {
+        return iri;
     }
 }

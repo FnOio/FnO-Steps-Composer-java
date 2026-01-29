@@ -6,8 +6,8 @@ import java.nio.file.Path;
 public class Main {
 
     static void main(String[] args) throws IOException {
-        //Path scenarioDir = Path.of("/home/geraldh/projects/2024_bocemon/code/use-case-scenario-c-thermal-fno-steps/scenario_manually/");
-        Path scenarioDir = Path.of("/home/geraldh/projects/oslo/oslo-steps-workflow-composer/scenarios/stepsAND");
+        Path scenarioDir = Path.of("/home/geraldh/projects/2024_bocemon/code/use-case-scenario-c-thermal-fno-steps/scenario_manually/");
+        //Path scenarioDir = Path.of("/home/geraldh/projects/oslo/oslo-steps-workflow-composer/scenarios/stepsAND");
         Path shapesPath = scenarioDir.resolve("shapes.ttl");
         Path statePath = scenarioDir.resolve("states.ttl");
         Path stepsPath = scenarioDir.resolve("steps.ttl");

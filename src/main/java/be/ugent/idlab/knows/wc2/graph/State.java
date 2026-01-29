@@ -6,13 +6,19 @@ import static be.ugent.idlab.knows.wc2.graph.Operator.*;
 
 public class State {
     private final String iri;
+    private final boolean isGoal;
     private final Set<Step> nextSteps = new HashSet<>();
     private final Set<Step> previousSteps = new HashSet<>();
     private Operator operator = None;
     private boolean operatorFixed = false;
 
-    public State(String iri) {
+    public State(String iri, boolean isGoal) {
         this.iri = iri;
+        this.isGoal = isGoal;
+    }
+
+    public State(String iri) {
+        this(iri, false);
     }
 
     public void setPreviousStep(final Step step) {
@@ -29,6 +35,16 @@ public class State {
         fixOperator(None);
     }
 
+    public void pushBackGoalState() {
+        pushBackGoalState(this);
+    }
+
+    void pushBackGoalState(State goalState) {
+        for (Step previousStep : previousSteps) {
+            previousStep.pushBackGoalState(goalState);
+        }
+    }
+
     public void fixOperator(Operator operator) {
         if (!operatorFixed) {
             operatorFixed = true;
@@ -36,14 +52,14 @@ public class State {
                 if (operator == AND) {
                     this.operator = AND;
                 } else {
-                    this.operator = OR;
+                    this.operator = XOR;
                 }
                 operator = None;
             }
 
             if (previousSteps.size() > 1) {
                 for (Step previousStep : previousSteps) {
-                    previousStep.pushBackOperator(OR);
+                    previousStep.pushBackOperator(XOR);
                 }
             } else {
                 for (Step previousStep : previousSteps) { // *should* be only one
@@ -59,48 +75,6 @@ public class State {
         }
     }
 
-
-
-/*        if (Objects.requireNonNull(operator) == None) {
-            if (nextSteps.isEmpty()) {
-                if (previousSteps.size() > 1) {
-                    for (Step previousStep : previousSteps) {
-                        previousStep.pushBackOperator(OR);
-                    }
-                } else {
-                    Step previousStep = previousSteps.iterator().next();
-                    if (previousStep.hasMultiplePreviousStates()) {
-                        previousStep.pushBackOperator(AND);
-                    }
-                }
-            }
-        } else {
-            if (nextSteps.size() > 1) {
-                // This is a split, so apply the operator
-                this.operator = operator;
-                for (Step previousStep : previousSteps) {
-                    previousStep.pushBackOperator(None);
-                }
-            } else {
-                // This is a
-                for (Step previousStep : previousSteps) {
-                    previousStep.pushBackOperator(operator);
-                }
-            }
-        }
-
-    }*/
-
-    /*void pushBackOperator(final Operator operator) {
-        if (nextSteps.size() > 1) {
-            this.operator = operator;
-        } else {
-            for (Step previousStep : previousSteps) {
-                previousStep.pushBackOperator(operator);
-            }
-        }
-    }*/
-
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
@@ -111,5 +85,10 @@ public class State {
     @Override
     public int hashCode() {
         return Objects.hashCode(iri);
+    }
+
+    @Override
+    public String toString() {
+        return iri;
     }
 }
