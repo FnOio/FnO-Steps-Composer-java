@@ -21,6 +21,8 @@ import static be.ugent.idlab.knows.wc2.graph.Operator.*;
 
 public class QueryGraphBuilder {
     private final Graph stepsGraph;
+    private final Graph shapesGraph;
+    private final Graph statesGraph;
     private final Set<String> goalStates;
 
     private final Map<String, State> processedStates = new HashMap<>();
@@ -28,28 +30,37 @@ public class QueryGraphBuilder {
     private static final Node producesStatePredicate = NodeFactory.createURI("https://w3id.org/imec/ns/fno-steps#producesState");
     private static final Node requiresStatePredicate = NodeFactory.createURI("https://w3id.org/imec/ns/fno-steps#requiresState");
     private static final Node typePredicate = NodeFactory.createURI("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
+    private static final Node shaclPropertyPredicate = NodeFactory.createURI("http://www.w3.org/ns/shacl#property");
+    private static final Node stateShapePredicate = NodeFactory.createURI("https://w3id.org/imec/ns/fno-steps#hasStateShape");
+
 
     private static final Node journeyLevelStepClass = NodeFactory.createURI("https://w3id.org/imec/ns/fno-steps#JourneyLevelStep");
     private static final Node containerLevelStepClass = NodeFactory.createURI("https://w3id.org/imec/ns/fno-steps#ContainerLevelStep");
 
     private static final Node emptyState = NodeFactory.createURI("https://w3id.org/imec/ns/fno-steps#emptyState");
 
-    private QueryGraphBuilder(Graph stepsGraph, Set<String> goalStates) {
+    private QueryGraphBuilder(Graph stepsGraph, Set<String> goalStates, Graph shapesGraph, Graph statesGraph) {
         this.stepsGraph = stepsGraph;
         this.goalStates = goalStates;
+        this.shapesGraph = shapesGraph;
+        this.statesGraph = statesGraph;
     }
 
     public static QueryGraphBuilder create(
             final String stepsPath,
-            final String goalStatesPath
+            final String goalStatesPath,
+            final String shapesPath,
+            final String statesPath
     ) throws IOException {
         Graph stepsGraph = RDFDataMgr.loadGraph(stepsPath);
+        Graph shapesGraph = RDFDataMgr.loadGraph(shapesPath);
+        Graph statesGraph = RDFDataMgr.loadGraph(statesPath);
         // Read the goal states
         Set<String> goalStates = readGoalStates(goalStatesPath);
-        return new QueryGraphBuilder(stepsGraph, goalStates);
+        return new QueryGraphBuilder(stepsGraph, goalStates, shapesGraph, statesGraph);
     }
 
-    public void build() {
+    public QueryGraph build() {
         // Ignore journey- and container level steps; so here component steps must form paths...
         deleteNodesOfType(stepsGraph, journeyLevelStepClass);
         deleteNodesOfType(stepsGraph, containerLevelStepClass);
@@ -59,7 +70,9 @@ public class QueryGraphBuilder {
             Node goalState = NodeFactory.createURI(goalStateIri);
             processPathsBackwards(goalState, new Stack<>(), null, null);
         }
-        QueryGraph queryGraph = new QueryGraph(processedStates);
+        // map shapes to states
+        Map<String, String> shapeToState = getShapeToStateMap();
+        return new QueryGraph(processedStates, shapesGraph, shapeToState);
     }
 
     private void processPathsBackwards(final Node currentStateNode,
@@ -126,6 +139,24 @@ public class QueryGraphBuilder {
                 processPathsBackwards(previousStateTriple.getObject(), operators, previousStepIRI, currentState);
             }
         }
+    }
+
+    private Map<String, String> getShapeToStateMap() {
+        Map<String, String> propertyShapeToState = new HashMap<>();
+        // Find which StateShape has which PropertyShape
+        for (ExtendedIterator<Triple> shapeIt = shapesGraph.find(Node.ANY, shaclPropertyPredicate, Node.ANY); shapeIt.hasNext(); ) {
+            Triple shapeTriple = shapeIt.next();
+            Node propertyShapeNode = shapeTriple.getObject();
+            Node stateShapeNode = shapeTriple.getSubject();
+
+            // Find which State has which StateShape, and add to map ProperyShape -> State
+            for (ExtendedIterator<Triple> stateIt = statesGraph.find(Node.ANY, stateShapePredicate, stateShapeNode); stateIt.hasNext(); ) {
+                Triple stateTriple = stateIt.next();    // *should* be one
+                Node stateNode = stateTriple.getSubject();
+                propertyShapeToState.put(propertyShapeNode.getURI(), stateNode.getURI());
+            }
+        }
+        return propertyShapeToState;
     }
 
     private static void deleteNodesOfType(final Graph graph, final Node classNode) {

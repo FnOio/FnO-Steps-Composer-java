@@ -1,5 +1,7 @@
 package be.ugent.idlab.knows.wc2;
 
+import be.ugent.idlab.knows.wc2.graph.QueryGraph;
+
 import java.io.IOException;
 import java.nio.file.Path;
 
@@ -8,13 +10,13 @@ public class Main {
     static void main() throws IOException {
         Path scenarioDir = Path.of("/home/geraldh/projects/2024_bocemon/code/use-case-scenario-c-thermal-fno-steps/scenario_manually/");
         //Path scenarioDir = Path.of("/home/geraldh/projects/oslo/oslo-steps-workflow-composer/scenarios/stepsOR");
-        //Path shapesPath = scenarioDir.resolve("shapes.ttl");
-        //Path statePath = scenarioDir.resolve("states.ttl");
+        Path shapesPath = scenarioDir.resolve("shapes.ttl");
+        Path statesPath = scenarioDir.resolve("states.ttl");
         Path stepsPath = scenarioDir.resolve("steps.ttl");
         Path goalStatesPath = scenarioDir.resolve("goalStates.txt");
 
-        QueryGraphBuilder queryGraphBuilder = QueryGraphBuilder.create(stepsPath.toString(), goalStatesPath.toString());
-        queryGraphBuilder.build();
+        QueryGraphBuilder queryGraphBuilder = QueryGraphBuilder.create(stepsPath.toString(), goalStatesPath.toString(), shapesPath.toString(), statesPath.toString());
+        QueryGraph queryGraph = queryGraphBuilder.build();
 
 
 //        Map<Node, Node> propertyShapeToState = getPropertyShapeToStateMap(shapesGraph, statesGraph);
