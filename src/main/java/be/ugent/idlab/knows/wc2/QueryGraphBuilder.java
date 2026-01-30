@@ -1,6 +1,7 @@
 package be.ugent.idlab.knows.wc2;
 
 import be.ugent.idlab.knows.wc2.graph.Operator;
+import be.ugent.idlab.knows.wc2.graph.QueryGraph;
 import be.ugent.idlab.knows.wc2.graph.State;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
@@ -48,18 +49,6 @@ public class QueryGraphBuilder {
         return new QueryGraphBuilder(stepsGraph, goalStates);
     }
 
-    private static Set<String> readGoalStates(final String goalStatesFile) throws IOException {
-        Set<String> goalStates = new HashSet<>();
-        List<String> lines = Files.readAllLines(Path.of(goalStatesFile), StandardCharsets.UTF_8);
-        for (String line : lines) {
-            line = line.trim();
-            if (!line.isBlank() && !line.startsWith("#")) {
-                goalStates.add(line);
-            }
-        }
-        return goalStates;
-    }
-
     public void build() {
         // Ignore journey- and container level steps; so here component steps must form paths...
         deleteNodesOfType(stepsGraph, journeyLevelStepClass);
@@ -70,6 +59,7 @@ public class QueryGraphBuilder {
             Node goalState = NodeFactory.createURI(goalStateIri);
             processPathsBackwards(goalState, new Stack<>(), null, null);
         }
+        QueryGraph queryGraph = new QueryGraph(processedStates);
     }
 
     private void processPathsBackwards(final Node currentStateNode,
@@ -151,4 +141,17 @@ public class QueryGraphBuilder {
             graph.remove(node, Node.ANY, Node.ANY);
         }
     }
+
+    private static Set<String> readGoalStates(final String goalStatesFile) throws IOException {
+        Set<String> goalStates = new HashSet<>();
+        List<String> lines = Files.readAllLines(Path.of(goalStatesFile), StandardCharsets.UTF_8);
+        for (String line : lines) {
+            line = line.trim();
+            if (!line.isBlank() && !line.startsWith("#")) {
+                goalStates.add(line);
+            }
+        }
+        return goalStates;
+    }
+
 }
