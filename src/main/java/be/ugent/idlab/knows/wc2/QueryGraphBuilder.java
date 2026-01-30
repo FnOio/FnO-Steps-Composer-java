@@ -2,8 +2,6 @@ package be.ugent.idlab.knows.wc2;
 
 import be.ugent.idlab.knows.wc2.graph.Operator;
 import be.ugent.idlab.knows.wc2.graph.State;
-import be.ugent.idlab.knows.wc2.graph.State2;
-import be.ugent.idlab.knows.wc2.graph.Step;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
@@ -21,17 +19,11 @@ import static be.ugent.idlab.knows.wc2.graph.Operator.*;
 
 
 public class QueryGraphBuilder {
-    private final Graph shapesGraph;
     private final Graph stepsGraph;
-    private final Graph statesGraph;
     private final Set<String> goalStates;
 
     private final Map<String, State> processedStates = new HashMap<>();
-    private final Map<String, State2> processedStates2 = new HashMap<>();
-    private final Map<String, Step> processedSteps = new HashMap<>();
 
-    private static final Node shaclPropertyPredicate = NodeFactory.createURI("http://www.w3.org/ns/shacl#property");
-    private static final Node stateShapePredicate = NodeFactory.createURI("https://w3id.org/imec/ns/fno-steps#hasStateShape");
     private static final Node producesStatePredicate = NodeFactory.createURI("https://w3id.org/imec/ns/fno-steps#producesState");
     private static final Node requiresStatePredicate = NodeFactory.createURI("https://w3id.org/imec/ns/fno-steps#requiresState");
     private static final Node typePredicate = NodeFactory.createURI("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
@@ -41,25 +33,19 @@ public class QueryGraphBuilder {
 
     private static final Node emptyState = NodeFactory.createURI("https://w3id.org/imec/ns/fno-steps#emptyState");
 
-    private QueryGraphBuilder(Graph shapesGraph, Graph stepsGraph, Graph statesGraph, Set<String> goalStates) {
-        this.shapesGraph = shapesGraph;
+    private QueryGraphBuilder(Graph stepsGraph, Set<String> goalStates) {
         this.stepsGraph = stepsGraph;
-        this.statesGraph = statesGraph;
         this.goalStates = goalStates;
     }
 
     public static QueryGraphBuilder create(
-            final String shapesPath,
-            final String statesPath,
             final String stepsPath,
             final String goalStatesPath
     ) throws IOException {
-        Graph shapesGraph = RDFDataMgr.loadGraph(shapesPath);
         Graph stepsGraph = RDFDataMgr.loadGraph(stepsPath);
-        Graph statesGraph = RDFDataMgr.loadGraph(statesPath);
         // Read the goal states
         Set<String> goalStates = readGoalStates(goalStatesPath);
-        return new QueryGraphBuilder(shapesGraph, stepsGraph, statesGraph, goalStates);
+        return new QueryGraphBuilder(stepsGraph, goalStates);
     }
 
     private static Set<String> readGoalStates(final String goalStatesFile) throws IOException {
@@ -82,39 +68,25 @@ public class QueryGraphBuilder {
         // first build graph
         for (String goalStateIri : goalStates) {
             Node goalState = NodeFactory.createURI(goalStateIri);
-            //processPathsBackwards(goalState, true, 0);
-            processPathsBackwards2(goalState, new Stack<>(), null, null);
+            processPathsBackwards(goalState, new Stack<>(), null, null);
         }
-
-/*        // then apply the right operators
-        for (String goalStateIri : goalStates) {
-            State goalState = processedStates.get(goalStateIri);
-            goalState.fixOperator();
-            goalState.pushBackGoalState();
-        }*/
-
-        System.out.println("Done!");
     }
 
-    private void processPathsBackwards2(final Node currentStateNode,
-                                        final Stack<Operator> operators,
-                                        final String nextStepIRI,
-                                        final State2 nextState
+    private void processPathsBackwards(final Node currentStateNode,
+                                       final Stack<Operator> operators,
+                                       final String nextStepIRI,
+                                       final State nextState
     ) {
-        int indentation = operators.size() * 2;
+
         String currentStateIRI = currentStateNode.getURI();
-        System.out.println(("* currentState = " + currentStateIRI).indent(indentation));
-        System.out.println(("  operators: " + operators).indent(indentation));
-
         boolean currentStateAlreadyVisited = false;
-
-        State2 currentState;
-        if (processedStates2.containsKey(currentStateIRI)) {
-            currentState = processedStates2.get(currentStateIRI);
+        State currentState;
+        if (processedStates.containsKey(currentStateIRI)) {
+            currentState = processedStates.get(currentStateIRI);
             currentStateAlreadyVisited = true;
         } else {
-            currentState = new State2(currentStateIRI);
-            processedStates2.put(currentStateIRI, currentState);
+            currentState = new State(currentStateIRI);
+            processedStates.put(currentStateIRI, currentState);
         }
 
         if (nextStepIRI != null && nextState != null) {
@@ -130,8 +102,6 @@ public class QueryGraphBuilder {
         if (outgoingSteps.size() > 1) {
             Operator operator = operators.empty() ? XOR : operators.pop();
             currentState.setOperator(operator);
-            System.out.println(("Split! Operator: " + operator).indent(indentation));
-            // subPath...
         }
 
         // The recursion ends when we reached the start state, emptyState!
@@ -161,39 +131,10 @@ public class QueryGraphBuilder {
         for (Triple incomingStep : incomingSteps) {
             Node previousStep = incomingStep.getSubject();
             String previousStepIRI = previousStep.getURI();
-            System.out.println(("previousStep = " + previousStepIRI).indent(indentation));
             for (ExtendedIterator<Triple> previousStateIter = stepsGraph.find(previousStep, requiresStatePredicate, Node.ANY); previousStateIter.hasNext(); ) {
                 Triple previousStateTriple = previousStateIter.next();
-                processPathsBackwards2(previousStateTriple.getObject(), operators, previousStepIRI, currentState);
+                processPathsBackwards(previousStateTriple.getObject(), operators, previousStepIRI, currentState);
             }
-        }
-    }
-
-    private void processPathsBackwards(final Node currentStateNode, boolean isGoalState, final int stackDepth) {
-        int indentation = stackDepth * 2;
-        System.out.println(("* currentState = " + currentStateNode.getURI()).indent(indentation));
-        String currentStateIRI = currentStateNode.getURI();
-        State currentState = processedStates.computeIfAbsent(currentStateIRI,iri -> new State(iri, isGoalState));
-        if (currentStateNode.equals(emptyState)) {
-            // done!
-            return;
-        }
-
-        List<Triple> incomingSteps = stepsGraph.find(Node.ANY, producesStatePredicate, currentStateNode).toList();
-        for (Triple incomingStep : incomingSteps) {
-            Node previousStepNode = incomingStep.getSubject();
-            System.out.println(("previousStep = " + previousStepNode.getURI()).indent(indentation));
-            Step previousStep = processedSteps.computeIfAbsent(previousStepNode.getURI(), Step::new);
-            currentState.setPreviousStep(previousStep);
-            for (ExtendedIterator<Triple> previousStateIter = stepsGraph.find(previousStepNode, requiresStatePredicate, Node.ANY); previousStateIter.hasNext(); ) {
-                Triple previousStateTriple = previousStateIter.next();
-                Node previousStateNode = previousStateTriple.getObject();
-                String previousStateIRI = previousStateNode.getURI();
-                State previousState = processedStates.computeIfAbsent(previousStateIRI, State::new);
-                previousState.setNextStep(previousStep);
-                processPathsBackwards(previousStateNode, false, stackDepth + 1);
-            }
-
         }
     }
 

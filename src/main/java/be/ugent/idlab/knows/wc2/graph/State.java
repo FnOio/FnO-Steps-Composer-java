@@ -1,90 +1,49 @@
 package be.ugent.idlab.knows.wc2.graph;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
-import static be.ugent.idlab.knows.wc2.graph.Operator.*;
+import static be.ugent.idlab.knows.wc2.graph.Operator.None;
 
 public class State {
-    private final String iri;
-    private final boolean isGoal;
-    private final Set<Step> nextSteps = new HashSet<>();
-    private final Set<Step> previousSteps = new HashSet<>();
-    private Operator operator = None;
-    private boolean operatorFixed = false;
+    /**
+     * The unique identifier of the state.
+     */
+    private final String iri;  // the IRI
 
-    public State(String iri, boolean isGoal) {
-        this.iri = iri;
-        this.isGoal = isGoal;
-    }
+    /**
+     * When a path in the graph splits (i.e. multiple next steps),
+     * this operator decides how to follow the next steps
+     */
+    private Operator operator = None;
+
+    /**
+     * Here two paths come together and this operator is of the split
+     * of these paths.
+     * Not sure if this is needed :)
+     */
+    private Operator endOfOperator = None;
+
+    /**
+     * This map contains the next steps and states.
+     * A step IRI is mapped to a State object.
+     */
+    private final Map<String, State> nextSteps = new HashMap<>();
 
     public State(String iri) {
-        this(iri, false);
+        this.iri = iri;
     }
 
-    public void setPreviousStep(final Step step) {
-        step.setNextState(this);
-        previousSteps.add(step);
+    public void setOperator(Operator operator) {
+        this.operator = operator;
     }
 
-    public void setNextStep(final Step step) {
-        step.setPreviousState(this);
-        nextSteps.add(step);
+    public void setEndOfOperator(Operator operator) {
+        this.endOfOperator = operator;
     }
 
-    public void fixOperator() {
-        fixOperator(None);
-    }
-
-    public void pushBackGoalState() {
-        pushBackGoalState(this);
-    }
-
-    void pushBackGoalState(State goalState) {
-        for (Step previousStep : previousSteps) {
-            previousStep.pushBackGoalState(goalState);
-        }
-    }
-
-    public void fixOperator(Operator operator) {
-        if (!operatorFixed) {
-            operatorFixed = true;
-            if (nextSteps.size() > 1) {
-                if (operator == AND) {
-                    this.operator = AND;
-                } else {
-                    this.operator = XOR;
-                }
-                operator = None;
-            }
-
-            if (previousSteps.size() > 1) {
-                for (Step previousStep : previousSteps) {
-                    previousStep.pushBackOperator(XOR);
-                }
-            } else {
-                for (Step previousStep : previousSteps) { // *should* be only one
-                    if (previousStep.hasMultiplePreviousStates()) {
-                        previousStep.pushBackOperator(AND);
-                    } else {
-                        //this.operator = operator;
-                        //if (operator != None) {}
-                        previousStep.pushBackOperator(operator);
-                    }
-                }
-            }
-        }
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        State state = (State) o;
-        return Objects.equals(iri, state.iri);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(iri);
+    public void addNextState(final String stepIRI, final State nextState) {
+        nextSteps.put(stepIRI, nextState);
     }
 
     @Override
