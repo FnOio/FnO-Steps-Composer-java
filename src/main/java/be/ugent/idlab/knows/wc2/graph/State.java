@@ -1,7 +1,9 @@
 package be.ugent.idlab.knows.wc2.graph;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import static be.ugent.idlab.knows.wc2.graph.Operator.None;
 
@@ -24,11 +26,14 @@ public class State {
      */
     private Operator endOfOperator = None;
 
+    private Status status = Status.None;
+
     /**
      * This map contains the next steps and states.
      * A step IRI is mapped to a State object.
      */
     private final Map<String, State> nextSteps = new HashMap<>();
+    private final Set<State> previousSteps = new HashSet<>();
 
     public State(String iri) {
         this.iri = iri;
@@ -46,8 +51,44 @@ public class State {
         nextSteps.put(stepIRI, nextState);
     }
 
+    public void addpreviousState(final State previousState) {
+        previousSteps.add(previousState);
+    }
+
+    public void mark(Status status) {
+        this.status = this.status.getHighestStatus(status);
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    public boolean isGoal() {
+        return nextSteps.isEmpty();
+    }
+
+    public Map<String, State> getNextSteps() {
+        return nextSteps;
+    }
+
+    public Set<State> getPreviousStates() {
+        return previousSteps;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
     @Override
     public String toString() {
         return iri;
+    }
+
+    public Operator getOperator() {
+        return operator;
+    }
+
+    public Operator getEndOfOperator() {
+        return endOfOperator;
     }
 }

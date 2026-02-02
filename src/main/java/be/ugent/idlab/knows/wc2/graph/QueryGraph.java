@@ -8,13 +8,16 @@ import org.apache.jena.shacl.Shapes;
 import org.apache.jena.shacl.ValidationReport;
 import org.apache.jena.shacl.validation.ReportEntry;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import static be.ugent.idlab.knows.wc2.graph.Operator.XOR;
 
 public class QueryGraph {
     private final Map<String, State> states;
-    private final Graph shapesGraph;
     private final Map<String, String> shapeToState;
 
     private final Shapes shapes;
@@ -23,7 +26,6 @@ public class QueryGraph {
                       final Graph shapesGraph,
                       final Map<String, String> shapeToState) {
         this.states = states;
-        this.shapesGraph = shapesGraph;
         this.shapeToState = shapeToState;
         shapes = Shapes.parse(shapesGraph);
     }
@@ -35,6 +37,10 @@ public class QueryGraph {
     public void process(final String contextFile) {
         Graph context = RDFDataMgr.loadGraph(contextFile);
 
+        // Reset the status of all States in the graph
+        State startState = states.get("https://w3id.org/imec/ns/fno-steps#emptyState");
+        resetStatus(startState);
+
         // Which shapes/states DO NOT match the context (invalid)?
         Set<String> nonMatchingShapes = new HashSet<>();
         ValidationReport report = ShaclValidator.get().validate(shapes, context);
@@ -45,9 +51,106 @@ public class QueryGraph {
             nonMatchingShapes.add(shapeNode.getURI());
         }
 
+        // Mark nodes in the graph with their status
         Set<String> matchingShapes = new HashSet<>(shapeToState.keySet());
         matchingShapes.removeAll(nonMatchingShapes);
+        Set<String> matchingStates = matchingShapes.stream().map(shapeToState::get).collect(Collectors.toSet());
+        // add the emptyState (start state) to the matching states
+        matchingStates.add("https://w3id.org/imec/ns/fno-steps#emptyState");
 
-        System.out.println("Matching shapes: " + matchingShapes);
+        System.out.println("Matching states: " + matchingStates);
+        for (String matchingState : matchingStates) {
+            State state = states.get(matchingState);
+            markPreviousStates(state, Status.Current);
+        }
+
+        markNextStates(startState, Status.Current);
+
+        // Print the plan
+        printPlan();
+    }
+
+    private void markPreviousStates(State currentState, Status status) {
+        currentState.mark(status);
+        Status statusToPass = status;
+        if (status == Status.Done || currentState.getStatus() == Status.Current) {
+            statusToPass = Status.Done;
+        }
+        for (State previousState : currentState.getPreviousStates()) {
+            markPreviousStates(previousState, statusToPass);
+        }
+    }
+    
+    private void markNextStates(State currentState, Status status) {
+        currentState.mark(status);
+
+        Status statusToPass = status;
+        if (status == Status.Current) {
+            statusToPass = Status.Todo;
+        }
+
+        Collection<State> nextStates;
+        if (currentState.getOperator() == XOR && currentState.getStatus() == Status.Done) {
+            nextStates = currentState.getNextSteps().values().stream()
+                    .filter(step -> step.getStatus() == Status.Done || step.getStatus() == Status.Current)
+                    .collect(Collectors.toSet());
+        } else {
+            nextStates = currentState.getNextSteps().values();
+        }
+        for (State nextState : nextStates) {
+            markNextStates(nextState, statusToPass);
+        }
+    }
+
+    private void resetStatus(State state) {
+        state.setStatus(Status.None);
+        for (State nextState : state.getNextSteps().values()) {
+            resetStatus(nextState);
+        }
+    }
+
+    private void printPlan() {
+        State currentState = states.get("https://w3id.org/imec/ns/fno-steps#emptyState");
+        // print current state(s)
+        System.out.println("Current state(s):");
+        states.values().stream().filter(state -> state.getStatus() == Status.Current).forEach(System.out::println);
+
+        System.out.println("\nSteps:");
+        printPlan(currentState, 0);
+    }
+
+    private void printPlan(State currentState, int level) {
+        int nextLevel = level;
+        switch (currentState.getOperator()) {
+            case XOR -> {
+                System.out.print("OR".indent(level * 2));
+                nextLevel++;
+            }
+            case AND -> {
+                System.out.print("AND".indent(level * 2));
+                nextLevel++;
+            }
+        }
+        for (Map.Entry<String, State> stringStateEntry : currentState.getNextSteps().entrySet()) {
+            String nextStep =  stringStateEntry.getKey();
+            State nextState  = stringStateEntry.getValue();
+
+            String statusString = "";
+            switch (nextState.getStatus()) {
+                case None -> statusString = " (alternative path)";
+                case Done, Current -> statusString = " (done) ";
+                case Todo ->  {
+                    if (currentState.getStatus() == Status.None) {
+                        statusString = " (alternative path)";
+                    } else {
+                        statusString = " (to do)";
+                    }
+                }
+            }
+
+            System.out.print((nextStep + statusString).indent(level * 2));
+            printPlan(nextState, nextLevel);
+
+        }
     }
 }

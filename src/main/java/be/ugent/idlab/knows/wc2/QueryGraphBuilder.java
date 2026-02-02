@@ -94,6 +94,7 @@ public class QueryGraphBuilder {
 
         if (nextStepIRI != null && nextState != null) {
             currentState.addNextState(nextStepIRI, nextState);
+            nextState.addpreviousState(currentState);
         }
 
         if (currentStateAlreadyVisited) {
