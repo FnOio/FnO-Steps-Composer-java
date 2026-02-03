@@ -63,10 +63,6 @@ public class State {
         this.status = status;
     }
 
-    public boolean isGoal() {
-        return nextSteps.isEmpty();
-    }
-
     public Map<String, State> getNextSteps() {
         return nextSteps;
     }
@@ -77,10 +73,6 @@ public class State {
 
     public Status getStatus() {
         return status;
-    }
-
-    public String getIri() {
-        return iri;
     }
 
     @Override
