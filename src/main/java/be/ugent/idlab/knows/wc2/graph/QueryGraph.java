@@ -8,7 +8,6 @@ import org.apache.jena.shacl.Shapes;
 import org.apache.jena.shacl.ValidationReport;
 import org.apache.jena.shacl.validation.ReportEntry;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -61,46 +60,96 @@ public class QueryGraph {
         System.out.println("Matching states: " + matchingStates);
         for (String matchingState : matchingStates) {
             State state = states.get(matchingState);
-            markPreviousStates(state, Status.Current);
+            pruneGraph(state, null);
+            //markPreviousStates(state, Status.Current);
         }
 
-        markNextStates(startState, Status.Current);
+        //markNextStates(startState, Status.Current);
 
         // Print the plan
         printPlan();
     }
 
-    private void markPreviousStates(State currentState, Status status) {
-        currentState.mark(status);
-        Status statusToPass = status;
-        if (status == Status.Done || currentState.getStatus() == Status.Current) {
-            statusToPass = Status.Done;
+    private void pruneGraph(State currentState, State previousState) {
+        if (currentState.getOperator().equals(XOR)) {
+            return;
+        }
+        if (currentState.getEndOfOperator().equals(XOR) && previousState != null) {
+            // prune!
+            // first get all other "incoming" states
+            Set<State> prevStatesToRemove = new HashSet<>(currentState.getPreviousStates());
+            prevStatesToRemove.remove(previousState);
+            // prune these states until start of XOR (should be max 1)
+            for (State prevState : prevStatesToRemove) {
+                pruneBackwardsTillXOR(prevState, currentState, 0);
+            }
+            return;
+        }
+        for (State nextState : currentState.getNextSteps().values()) {
+            pruneGraph(nextState, currentState);
+        }
+    }
+
+    private void pruneBackwardsTillXOR(State currentState, State nextState, int xorLevel) {
+        currentState.getNextSteps().values().remove(nextState); // should only be one entry
+        nextState.getPreviousStates().remove(currentState);
+        if (currentState.getEndOfOperator().equals(XOR)) {
+            xorLevel++;
+        } else if (currentState.getOperator().equals(XOR)) {
+            if (xorLevel == 0) {
+                return;
+            } else {
+                xorLevel--;
+            }
         }
         for (State previousState : currentState.getPreviousStates()) {
-            markPreviousStates(previousState, statusToPass);
+            pruneBackwardsTillXOR(previousState, currentState, xorLevel);
         }
     }
-    
-    private void markNextStates(State currentState, Status status) {
-        currentState.mark(status);
 
-        Status statusToPass = status;
-        if (status == Status.Current) {
-            statusToPass = Status.Todo;
-        }
 
-        Collection<State> nextStates;
-        if (currentState.getOperator() == XOR && currentState.getStatus() == Status.Done) {
-            nextStates = currentState.getNextSteps().values().stream()
-                    .filter(step -> step.getStatus() == Status.Done || step.getStatus() == Status.Current)
-                    .collect(Collectors.toSet());
-        } else {
-            nextStates = currentState.getNextSteps().values();
-        }
-        for (State nextState : nextStates) {
-            markNextStates(nextState, statusToPass);
-        }
-    }
+//    private void markPreviousStates(State currentState, Status status) {
+//        currentState.mark(status);
+//        Status statusToPass = status;
+//        if (status == Status.Done || currentState.getStatus() == Status.Current) {
+//            statusToPass = Status.Done;
+//        }
+//
+//        // TODO: if XOR, only follow previous states who are "followed"; one end state could override everything with "done"!
+//        Set<State> previousStates;
+//        if (currentState.getOperator() == XOR) {
+//            // only follow path where previous state status != None
+//            previousStates = currentState.getPreviousStates().stream()
+//                    .filter(prevState -> prevState.getStatus() != Status.None)
+//                    .collect(Collectors.toSet());
+//        } else {
+//            previousStates = currentState.getPreviousStates();
+//        }
+//        for (State previousState : previousStates) {
+//            markPreviousStates(previousState, statusToPass);
+//        }
+//    }
+//
+//    private void markNextStates(State currentState, Status status) {
+//        currentState.mark(status);
+//
+//        Status statusToPass = status;
+//        if (status == Status.Current) {
+//            statusToPass = Status.Todo;
+//        }
+//
+//        Collection<State> nextStates;
+//        if (currentState.getOperator() == XOR && currentState.getStatus() == Status.Done) {
+//            nextStates = currentState.getNextSteps().values().stream()
+//                    .filter(step -> step.getStatus() == Status.Done || step.getStatus() == Status.Current)
+//                    .collect(Collectors.toSet());
+//        } else {
+//            nextStates = currentState.getNextSteps().values();
+//        }
+//        for (State nextState : nextStates) {
+//            markNextStates(nextState, statusToPass);
+//        }
+//    }
 
     private void resetStatus(State state) {
         state.setStatus(Status.None);

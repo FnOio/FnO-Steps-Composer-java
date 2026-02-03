@@ -79,6 +79,10 @@ public class State {
         return status;
     }
 
+    public String getIri() {
+        return iri;
+    }
+
     @Override
     public String toString() {
         return iri;

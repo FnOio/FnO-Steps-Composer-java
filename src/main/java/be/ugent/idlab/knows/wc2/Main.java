@@ -15,7 +15,7 @@ public class Main {
         Path stepsPath = scenarioDir.resolve("steps.ttl");
         Path goalStatesPath = scenarioDir.resolve("goalStates.txt");
 
-        Path contextPath = scenarioDir.resolve("data_option1_01.ttl");
+        Path contextPath = scenarioDir.resolve("data_option1_02.ttl");
 
         QueryGraphBuilder queryGraphBuilder = QueryGraphBuilder.create(stepsPath.toString(), goalStatesPath.toString(), shapesPath.toString(), statesPath.toString());
         QueryGraph queryGraph = queryGraphBuilder.build();
