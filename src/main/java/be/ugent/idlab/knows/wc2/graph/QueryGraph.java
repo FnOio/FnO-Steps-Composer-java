@@ -61,10 +61,8 @@ public class QueryGraph {
         for (String matchingState : matchingStates) {
             State state = states.get(matchingState);
             pruneGraph(state, null);
-            //markPreviousStates(state, Status.Current);
+            markPreviousStates(state, Status.Current);
         }
-
-        //markNextStates(startState, Status.Current);
 
         // Print the plan
         printPlan();
@@ -109,49 +107,20 @@ public class QueryGraph {
         }
     }
 
+    private void markPreviousStates(State currentState, Status status) {
+        if (currentState.getStatus() == Status.Deleted) {
+            return;
+        }
+        currentState.mark(status);
 
-//    private void markPreviousStates(State currentState, Status status) {
-//        currentState.mark(status);
-//        Status statusToPass = status;
-//        if (status == Status.Done || currentState.getStatus() == Status.Current) {
-//            statusToPass = Status.Done;
-//        }
-//
-//        // TODO: if XOR, only follow previous states who are "followed"; one end state could override everything with "done"!
-//        Set<State> previousStates;
-//        if (currentState.getOperator() == XOR) {
-//            // only follow path where previous state status != None
-//            previousStates = currentState.getPreviousStates().stream()
-//                    .filter(prevState -> prevState.getStatus() != Status.None)
-//                    .collect(Collectors.toSet());
-//        } else {
-//            previousStates = currentState.getPreviousStates();
-//        }
-//        for (State previousState : previousStates) {
-//            markPreviousStates(previousState, statusToPass);
-//        }
-//    }
-//
-//    private void markNextStates(State currentState, Status status) {
-//        currentState.mark(status);
-//
-//        Status statusToPass = status;
-//        if (status == Status.Current) {
-//            statusToPass = Status.Todo;
-//        }
-//
-//        Collection<State> nextStates;
-//        if (currentState.getOperator() == XOR && currentState.getStatus() == Status.Done) {
-//            nextStates = currentState.getNextSteps().values().stream()
-//                    .filter(step -> step.getStatus() == Status.Done || step.getStatus() == Status.Current)
-//                    .collect(Collectors.toSet());
-//        } else {
-//            nextStates = currentState.getNextSteps().values();
-//        }
-//        for (State nextState : nextStates) {
-//            markNextStates(nextState, statusToPass);
-//        }
-//    }
+        Status statusToPass = status;
+        if (status == Status.Done || currentState.getStatus() == Status.Current) {
+            statusToPass = Status.Done;
+        }
+        for (State previousState : currentState.getPreviousStates()) {
+            markPreviousStates(previousState, statusToPass);
+        }
+    }
 
     private void resetStatus(State state) {
         state.setStatus(Status.None);
@@ -188,7 +157,7 @@ public class QueryGraph {
 
             String statusString = "";
             switch (nextState.getStatus()) {
-                case None -> statusString = " (alternative path)";
+                case Deleted -> statusString = " (unreachable)";
                 case Done, Current -> statusString = " (done) ";
                 case Todo ->  {
                     if (currentState.getStatus() == Status.None) {
