@@ -57,7 +57,7 @@ public class QueryGraph {
         // add the emptyState (start state) to the matching states
         matchingStates.add("https://w3id.org/imec/ns/fno-steps#emptyState");
 
-        System.out.println("Matching states: " + matchingStates);
+        System.out.println("Matching states: " + matchingStates + '\n');
         for (String matchingState : matchingStates) {
             State state = states.get(matchingState);
             pruneGraph(state, null);
@@ -123,7 +123,7 @@ public class QueryGraph {
     }
 
     private void resetStatus(State state) {
-        state.setStatus(Status.None);
+        state.setStatus(Status.Todo);
         for (State nextState : state.getNextSteps().values()) {
             resetStatus(nextState);
         }
@@ -172,13 +172,7 @@ public class QueryGraph {
                         stepStatusString = " ☑";
                     }
                 }
-                case Todo ->  {
-                    if (currentState.getStatus() == Status.None) {
-                        stepStatusString = " ☒";
-                    } else {
-                        stepStatusString = " ☐";
-                    }
-                }
+                case Todo ->  stepStatusString = " ☐";
             }
 
             System.out.print(("Step:  " + nextStep + stepStatusString).indent(level * 2));

@@ -26,7 +26,7 @@ public class State {
      */
     private Operator endOfOperator = None;
 
-    private Status status = Status.None;
+    private Status status = Status.Todo;
 
     /**
      * This map contains the next steps and states.

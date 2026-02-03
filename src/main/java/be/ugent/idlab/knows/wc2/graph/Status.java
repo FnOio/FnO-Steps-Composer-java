@@ -1,11 +1,10 @@
 package be.ugent.idlab.knows.wc2.graph;
 
 public enum Status {
-    None(0),
-    Todo(1),
-    Current(2),
-    Done(3),
-    Deleted(4);
+    Todo(0),
+    Current(1),
+    Done(2),
+    Deleted(3);
 
     private final int rank;
 
