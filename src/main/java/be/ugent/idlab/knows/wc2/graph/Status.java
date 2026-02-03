@@ -4,7 +4,8 @@ public enum Status {
     None(0),
     Todo(1),
     Current(2),
-    Done(3);
+    Done(3),
+    Deleted(4);
 
     private final int rank;
 

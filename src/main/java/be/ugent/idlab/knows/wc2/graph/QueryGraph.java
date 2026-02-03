@@ -71,6 +71,9 @@ public class QueryGraph {
     }
 
     private void pruneGraph(State currentState, State previousState) {
+        if (currentState.getStatus().equals(Status.Deleted)) {
+            return;
+        }
         if (currentState.getOperator().equals(XOR)) {
             return;
         }
@@ -81,7 +84,7 @@ public class QueryGraph {
             prevStatesToRemove.remove(previousState);
             // prune these states until start of XOR (should be max 1)
             for (State prevState : prevStatesToRemove) {
-                pruneBackwardsTillXOR(prevState, currentState, 0);
+                pruneBackwardsTillXOR(prevState, 0);
             }
             return;
         }
@@ -90,9 +93,7 @@ public class QueryGraph {
         }
     }
 
-    private void pruneBackwardsTillXOR(State currentState, State nextState, int xorLevel) {
-        currentState.getNextSteps().values().remove(nextState); // should only be one entry
-        nextState.getPreviousStates().remove(currentState);
+    private void pruneBackwardsTillXOR(State currentState, int xorLevel) {
         if (currentState.getEndOfOperator().equals(XOR)) {
             xorLevel++;
         } else if (currentState.getOperator().equals(XOR)) {
@@ -102,8 +103,9 @@ public class QueryGraph {
                 xorLevel--;
             }
         }
+        currentState.setStatus(Status.Deleted);
         for (State previousState : currentState.getPreviousStates()) {
-            pruneBackwardsTillXOR(previousState, currentState, xorLevel);
+            pruneBackwardsTillXOR(previousState, xorLevel);
         }
     }
 
