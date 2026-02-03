@@ -141,6 +141,13 @@ public class QueryGraph {
 
     private void printPlan(State currentState, int level) {
         int nextLevel = level;
+        String currentStateStr = currentState.toString();
+        switch (currentState.getStatus()) {
+            case Done -> currentStateStr += " ☑";
+            case Current -> currentStateStr += " ☐";
+            case Deleted -> currentStateStr += " ☒";
+        }
+        System.out.print(("State: " + currentStateStr).indent(level * 2));
         switch (currentState.getOperator()) {
             case XOR -> {
                 System.out.print("OR".indent(level * 2));
@@ -155,20 +162,26 @@ public class QueryGraph {
             String nextStep =  stringStateEntry.getKey();
             State nextState  = stringStateEntry.getValue();
 
-            String statusString = "";
+            String stepStatusString = "";
             switch (nextState.getStatus()) {
-                case Deleted -> statusString = " (unreachable)";
-                case Done, Current -> statusString = " (done) ";
+                case Deleted -> stepStatusString = " ☒";
+                case Done, Current -> {
+                    if (currentState.getStatus() == Status.Deleted) {
+                        stepStatusString = " ☒";
+                    } else {
+                        stepStatusString = " ☑";
+                    }
+                }
                 case Todo ->  {
                     if (currentState.getStatus() == Status.None) {
-                        statusString = " (alternative path)";
+                        stepStatusString = " ☒";
                     } else {
-                        statusString = " (to do)";
+                        stepStatusString = " ☐";
                     }
                 }
             }
 
-            System.out.print((nextStep + statusString).indent(level * 2));
+            System.out.print(("Step:  " + nextStep + stepStatusString).indent(level * 2));
             printPlan(nextState, nextLevel);
 
         }
