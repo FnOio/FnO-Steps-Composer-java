@@ -65,41 +65,45 @@ public class QueryGraph {
         logger.debug("Matching states: {}\n", matchingStates);
         for (String matchingState : matchingStates) {
             State state = states.get(matchingState);
-            pruneGraph(state, null);
-            markPreviousStates(state, Status.Current);
+            markPreviousStates(state, Status.Current, null);
         }
 
         // Generate textual representation of the plan (graph)
         return printPlan();
     }
 
-    private void pruneGraph(State currentState, State previousState) {
-        if (currentState.getStatus().equals(Status.Deleted)) {
+    private void markPreviousStates(State currentState, Status status, State nextState) {
+        if (currentState.getStatus() == Status.Deleted) {
             return;
         }
-        if (currentState.getOperator().equals(XOR)) {
-            return;
-        }
-        if (currentState.getEndOfOperator().equals(XOR) && previousState != null) {
-            // prune!
-            // first get all other "incoming" states
-            Set<State> prevStatesToRemove = new HashSet<>(currentState.getPreviousStates());
-            prevStatesToRemove.remove(previousState);
-            // prune these states until start of XOR (should be max 1)
-            for (State prevState : prevStatesToRemove) {
-                pruneBackwardsTillXOR(prevState, 0);
+        currentState.mark(status);
+        if (currentState.getOperator().equals(XOR) && nextState != null) {
+            // first get all other "outgoing" states
+            Set<State> statesToRemove = new HashSet<>(currentState.getNextSteps().values());
+            statesToRemove.remove(nextState);
+            for (State state : statesToRemove) {
+                // prune these states until end of XOR or end state
+                pruneForwardUntilEndXOR(state, 0);
             }
-            return;
+
         }
-        for (State nextState : currentState.getNextSteps().values()) {
-            pruneGraph(nextState, currentState);
+        Status statusToPass = status;
+        if (status == Status.Done || currentState.getStatus() == Status.Current) {
+            statusToPass = Status.Done;
+        }
+        for (State previousState : currentState.getPreviousStates()) {
+            markPreviousStates(previousState, statusToPass, currentState);
         }
     }
 
-    private void pruneBackwardsTillXOR(State currentState, int xorLevel) {
-        if (currentState.getEndOfOperator().equals(XOR)) {
+    private void pruneForwardUntilEndXOR(State currentState, int xorLevel) {
+        if (currentState.getNextSteps().isEmpty()) {
+            currentState.setStatus(Status.Deleted);
+            return;
+        }
+        if (currentState.getOperator().equals(XOR)) {
             xorLevel++;
-        } else if (currentState.getOperator().equals(XOR)) {
+        } else if (currentState.getEndOfOperator().equals(XOR)) {
             if (xorLevel == 0) {
                 return;
             } else {
@@ -107,23 +111,8 @@ public class QueryGraph {
             }
         }
         currentState.setStatus(Status.Deleted);
-        for (State previousState : currentState.getPreviousStates()) {
-            pruneBackwardsTillXOR(previousState, xorLevel);
-        }
-    }
-
-    private void markPreviousStates(State currentState, Status status) {
-        if (currentState.getStatus() == Status.Deleted) {
-            return;
-        }
-        currentState.mark(status);
-
-        Status statusToPass = status;
-        if (status == Status.Done || currentState.getStatus() == Status.Current) {
-            statusToPass = Status.Done;
-        }
-        for (State previousState : currentState.getPreviousStates()) {
-            markPreviousStates(previousState, statusToPass);
+        for (State nextState : currentState.getNextSteps().values()) {
+            pruneForwardUntilEndXOR(nextState, xorLevel);
         }
     }
 
@@ -152,7 +141,7 @@ public class QueryGraph {
         String currentStateStr = currentState.toString();
         switch (currentState.getStatus()) {
             case Done -> currentStateStr += " ☑";
-            case Current -> currentStateStr += " ☐";
+            case Current -> currentStateStr += " ◉";
             case Deleted -> currentStateStr += " ☒";
         }
         outStr.append(("State: " + currentStateStr).indent(level * 2));
