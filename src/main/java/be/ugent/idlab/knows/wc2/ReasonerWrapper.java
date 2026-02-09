@@ -52,7 +52,7 @@ public class ReasonerWrapper {
         ProcessBuilder processBuilder = new ProcessBuilder();
         processBuilder.command(command);
         Process process = processBuilder.start();
-        InputCollector inputCollector = new InputCollector(process.getInputStream());
+        InputCollector inputCollector = new InputCollector(process.getInputStream(), process.getErrorStream());
         // Run inputCollector
         try (ExecutorService executor = Executors.newSingleThreadExecutor()) {
             Future<String> futureResult = executor.submit(inputCollector);
@@ -61,12 +61,16 @@ public class ReasonerWrapper {
         }
     }
 
-    private record InputCollector(InputStream inputStream) implements Callable<String> {
+    private record InputCollector(InputStream stdOut, InputStream stdErr) implements Callable<String> {
 
         @Override
             public String call() throws Exception {
-                byte[] bytes = inputStream.readAllBytes();
-                return new String(bytes, StandardCharsets.UTF_8);
+                byte[] bytesStdOut = stdOut.readAllBytes();
+                byte[] bytesStdErr = stdErr.readAllBytes();
+                if (bytesStdErr.length > 0) {
+                    throw new IOException("Could not reason! Cause: " + new String(bytesStdErr, StandardCharsets.UTF_8));
+                }
+                return new String(bytesStdOut, StandardCharsets.UTF_8);
             }
         }
 }
