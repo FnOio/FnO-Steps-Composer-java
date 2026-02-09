@@ -7,6 +7,8 @@ import org.apache.jena.shacl.ShaclValidator;
 import org.apache.jena.shacl.Shapes;
 import org.apache.jena.shacl.ValidationReport;
 import org.apache.jena.shacl.validation.ReportEntry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -16,6 +18,8 @@ import java.util.stream.Collectors;
 import static be.ugent.idlab.knows.wc2.graph.Operator.XOR;
 
 public class QueryGraph {
+    private final static Logger logger = LoggerFactory.getLogger(QueryGraph.class);
+
     private final Map<String, State> states;
     private final Map<String, String> shapeToState;
 
@@ -32,8 +36,9 @@ public class QueryGraph {
     /**
      * Calculate matching states, next steps to take, ...
      * @param contextFile   The context data + reasoned knowledge
+     * @return A textual representation of the workflow.
      */
-    public void process(final String contextFile) {
+    public String process(final String contextFile) {
         Graph context = RDFDataMgr.loadGraph(contextFile);
 
         // Reset the status of all States in the graph
@@ -46,7 +51,7 @@ public class QueryGraph {
         for (ReportEntry entry : report.getEntries()) {
             Node condextNode = entry.focusNode(); // The matching context node
             Node shapeNode = entry.source();
-            System.out.println(condextNode.getURI() + " does NOT match " + shapeNode.getURI());
+            logger.debug("{} does NOT match {}", condextNode, shapeNode);
             nonMatchingShapes.add(shapeNode.getURI());
         }
 
@@ -57,15 +62,15 @@ public class QueryGraph {
         // add the emptyState (start state) to the matching states
         matchingStates.add("https://w3id.org/imec/ns/fno-steps#emptyState");
 
-        System.out.println("Matching states: " + matchingStates + '\n');
+        logger.debug("Matching states: {}\n", matchingStates);
         for (String matchingState : matchingStates) {
             State state = states.get(matchingState);
             pruneGraph(state, null);
             markPreviousStates(state, Status.Current);
         }
 
-        // Print the plan
-        printPlan();
+        // Generate textual representation of the plan (graph)
+        return printPlan();
     }
 
     private void pruneGraph(State currentState, State previousState) {
@@ -129,17 +134,20 @@ public class QueryGraph {
         }
     }
 
-    private void printPlan() {
+    private String printPlan() {
+        StringBuilder outStr = new StringBuilder();
         State currentState = states.get("https://w3id.org/imec/ns/fno-steps#emptyState");
         // print current state(s)
-        System.out.println("Current state(s):");
-        states.values().stream().filter(state -> state.getStatus() == Status.Current).forEach(System.out::println);
+        outStr.append("Current state(s):\n");
+        states.values().stream().filter(state -> state.getStatus() == Status.Current).forEach(state -> outStr.append(state).append('\n'));
 
-        System.out.println("\nSteps:");
-        printPlan(currentState, 0);
+        outStr.append("\nSteps:\n");
+        outStr.append(printPlan(currentState, 0));
+        return outStr.toString();
     }
 
-    private void printPlan(State currentState, int level) {
+    private String printPlan(State currentState, int level) {
+        StringBuilder outStr = new StringBuilder();
         int nextLevel = level;
         String currentStateStr = currentState.toString();
         switch (currentState.getStatus()) {
@@ -147,14 +155,14 @@ public class QueryGraph {
             case Current -> currentStateStr += " ☐";
             case Deleted -> currentStateStr += " ☒";
         }
-        System.out.print(("State: " + currentStateStr).indent(level * 2));
+        outStr.append(("State: " + currentStateStr).indent(level * 2));
         switch (currentState.getOperator()) {
             case XOR -> {
-                System.out.print("OR".indent(level * 2));
+                outStr.append("OR".indent(level * 2));
                 nextLevel++;
             }
             case AND -> {
-                System.out.print("AND".indent(level * 2));
+                outStr.append("AND".indent(level * 2));
                 nextLevel++;
             }
         }
@@ -175,9 +183,9 @@ public class QueryGraph {
                 case Todo ->  stepStatusString = " ☐";
             }
 
-            System.out.print(("Step:  " + nextStep + stepStatusString).indent(level * 2));
-            printPlan(nextState, nextLevel);
-
+            outStr.append(("Step:  " + nextStep + stepStatusString).indent(level * 2));
+            outStr.append(printPlan(nextState, nextLevel));
         }
+        return outStr.toString();
     }
 }

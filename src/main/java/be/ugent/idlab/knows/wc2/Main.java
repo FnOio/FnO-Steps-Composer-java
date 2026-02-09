@@ -26,10 +26,10 @@ public class Main {
                 .addRequiredOption("i", "input-dir", true, "Directory containing following input files: shapes.ttl, states.ttl, steps.ttl, goalStates.txt.")
                 .addOption("c", "context", true, "Name of a file containing context data (data to operate on)." +
                         "It must exist in the input directory. If not given, all files named `data_*` will be processed alphabetically, as if playing a scenario.")
+                .addOption("e", "eye-bin", true, "Path to an EYE reasoner. Will be just 'eye' if omitted.")
                 .addOption("o", "output-dir", true, "Path to output directory. If not given, the input directory will be used. A subdirectory per context file is created.")
                 .addOption("r", "reasoning-file", true, "Name of an N3 file containing extra reasoning on the current context. It must be in the input directory.")
                 .addOption("h", "help",  false, "Print this help message.");
-        ;
 
         CommandLineParser parser = new DefaultParser();
         CommandLine cli;
@@ -42,7 +42,9 @@ public class Main {
                 Path statesPath = scenarioDir.resolve("states.ttl");
                 Path stepsPath = scenarioDir.resolve("steps.ttl");
                 Path goalStatesPath = scenarioDir.resolve("goalStates.txt");
-                Path outPath = cli.hasOption("output-dir") ? Paths.get(cli.getOptionValue("output-dir")) : scenarioDir.resolve("output");
+                Path outRootPath = cli.hasOption("output-dir") ? Paths.get(cli.getOptionValue("output-dir")) : scenarioDir.resolve("output");
+
+                String eyeBinPath = cli.hasOption("eye-bin") ? cli.getOptionValue("eye-bin") : "eye";
 
                 logger.debug("Scenario directory: {}", scenarioDir);
 
@@ -70,6 +72,10 @@ public class Main {
                     Path contextPath = scenarioDir.resolve(contextFileName);
 
                     // Get output directory and create if it doesn't exist
+                    Path outPath = outRootPath;
+                    if (contextFileNames.size() > 1) {
+                        outPath = outRootPath.resolve(contextFileName.substring(0, contextFileName.lastIndexOf('.')));
+                    }
                     Path contextOutputFile = outPath.resolve("context.ttl");
                     Files.createDirectories(contextOutputFile.getParent());
 
@@ -77,7 +83,7 @@ public class Main {
                     String context = Files.readString(contextPath);
                     if (cli.hasOption("reasoning-file")) {
                         Path reasoningFilePath = scenarioDir.resolve(cli.getOptionValue("reasoning-file"));
-                        String extraTriples = new ReasonerWrapper().run(contextPath.toString(), reasoningFilePath.toString());
+                        String extraTriples = new ReasonerWrapper(eyeBinPath).run(contextPath.toString(), reasoningFilePath.toString());
                         if (!extraTriples.isEmpty()) {
                             logger.debug("Extra triples found!");
                             context += extraTriples;
@@ -85,11 +91,13 @@ public class Main {
                     }
                     Files.writeString(contextOutputFile, context, StandardCharsets.UTF_8);
 
-                    // Finally, compose the workflow!
-                    queryGraph.process(contextOutputFile.toString());
+                    // Finally, compose the workflow! Print it and write to file
+                    String planStr = queryGraph.process(contextOutputFile.toString());
+                    System.out.println("OUTPUT:\n" + planStr);
+                    Path planOutputFile = outPath.resolve("plan.txt");
+                    Files.writeString(planOutputFile, planStr, StandardCharsets.UTF_8);
                 }
-
-
+                return;
             }
         }
         catch (Exception e) {
@@ -97,12 +105,5 @@ public class Main {
         }
         HelpFormatter formatter = HelpFormatter.builder().setShowSince(false).get();
         formatter.printHelp("Workflow Composer", "Calculate next steps to take given context data.", options, "Good luck.", true);
-
-
-        //Path scenarioDir = Path.of("/home/geraldh/projects/2024_bocemon/code/use-case-scenario-c-thermal-fno-steps/scenario_manually/");
-
-//        QueryGraphBuilder queryGraphBuilder = QueryGraphBuilder.create(stepsPath.toString(), goalStatesPath.toString(), shapesPath.toString(), statesPath.toString());
-//        QueryGraph queryGraph = queryGraphBuilder.build();
-//        queryGraph.process(contextPath.toString());
     }
 }

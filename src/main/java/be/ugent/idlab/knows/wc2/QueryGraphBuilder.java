@@ -9,6 +9,8 @@ import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.util.iterator.ExtendedIterator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -20,6 +22,8 @@ import static be.ugent.idlab.knows.wc2.graph.Operator.*;
 
 
 public class QueryGraphBuilder {
+    private static final Logger logger = LoggerFactory.getLogger(QueryGraphBuilder.class);
+
     private final Graph stepsGraph;
     private final Graph shapesGraph;
     private final Graph statesGraph;
@@ -169,7 +173,7 @@ public class QueryGraphBuilder {
         }
         // remove all triples with matching subjects
         for (Node node : nodesToDelete) {
-            System.out.println("Deleting node " + node.getURI());
+            logger.debug("Deleting node {}", node);
             graph.remove(node, Node.ANY, Node.ANY);
         }
     }
