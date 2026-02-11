@@ -37,9 +37,15 @@ public class Main {
             cli = parser.parse(options, args);
             if (!cli.hasOption("help")) {
 
-                for (Option option : cli.getOptions()) {
-                    logger.debug("{}: [{}]", option.getLongOpt(), option.getValue());
+                if (logger.isDebugEnabled()) {
+                    logger.debug("");
+                    logger.debug("==== CLI options ====");
+                    for (Option option : cli.getOptions()) {
+                        logger.debug("{}: [{}]", option.getLongOpt(), option.getValue());
+                    }
+                    logger.debug("=====================");
                 }
+
                 Path scenarioDir = Path.of(cli.getOptionValue("input-dir")).toAbsolutePath();
                 Path shapesPath = scenarioDir.resolve("shapes.ttl");
                 Path statesPath = scenarioDir.resolve("states.ttl");

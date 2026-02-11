@@ -1,5 +1,8 @@
 package be.ugent.idlab.knows.wc2;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -8,9 +11,11 @@ import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.concurrent.*;
 
 public class ReasonerWrapper {
+    private static final Logger logger = LoggerFactory.getLogger(ReasonerWrapper.class);
     private final String eyeBinPath;
 
     public ReasonerWrapper(final String eyeBinPath) {
@@ -28,6 +33,7 @@ public class ReasonerWrapper {
 
     private String runEyeling(String ...inputFiles) throws IOException, ExecutionException, InterruptedException, TimeoutException {
         // Put all data into one file
+        logger.debug("Running eyeling on input files {}", Arrays.asList(inputFiles));
         Path tmpFile = Files.createTempFile("dataforreasoner", ".n3");
         tmpFile.toFile().deleteOnExit();
         try (FileChannel inputForReasoner = new FileOutputStream(tmpFile.toFile()).getChannel()) {
