@@ -85,7 +85,7 @@ public class Main {
                     if (contextFileNames.size() > 1) {
                         outPath = outRootPath.resolve(contextFileName.substring(0, contextFileName.lastIndexOf('.')));
                     }
-                    Path contextOutputFile = outPath.resolve("context.ttl");
+                    Path contextOutputFile = outPath.resolve("context_after_reasoning.ttl");
                     Files.createDirectories(contextOutputFile.getParent());
 
                     // Apply reasoning to context, if some n3 file is given. Add these to the context
