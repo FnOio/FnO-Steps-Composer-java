@@ -127,10 +127,10 @@ public class QueryGraph {
         StringBuilder outStr = new StringBuilder();
         State currentState = states.get("https://w3id.org/imec/ns/fno-steps#emptyState");
         // print current state(s)
-        outStr.append("Current state(s):\n");
-        states.values().stream().filter(state -> state.getStatus() == Status.Current).forEach(state -> outStr.append(state).append('\n'));
+        //outStr.append("Current state(s):\n");
+        //states.values().stream().filter(state -> state.getStatus() == Status.Current).forEach(state -> outStr.append(state).append('\n'));
 
-        outStr.append("\nSteps:\n");
+        //outStr.append("\nSteps:\n");
         outStr.append(printPlan(currentState, 0));
         return outStr.toString();
     }
