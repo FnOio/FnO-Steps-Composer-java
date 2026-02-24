@@ -57,7 +57,13 @@ public class QueryGraph {
 
         // Mark nodes in the graph with their status
         Set<String> matchingShapes = new HashSet<>(shapeToState.keySet());
-        matchingShapes.removeAll(nonMatchingShapes);
+        if (report.getEntries().isEmpty()) {
+            logger.debug("No matching shapes found");
+            matchingShapes.clear();
+        } else {
+            // just remove the non-matching shapes
+            matchingShapes.removeAll(nonMatchingShapes);
+        }
         Set<String> matchingStates = matchingShapes.stream().map(shapeToState::get).collect(Collectors.toSet());
         // add the emptyState (start state) to the matching states
         matchingStates.add("https://w3id.org/imec/ns/fno-steps#emptyState");
