@@ -144,7 +144,7 @@ public class QueryGraph {
     private String printPlan(State currentState, int level) {
         StringBuilder outStr = new StringBuilder();
         int nextLevel = level;
-        String currentStateStr = currentState.toString();
+        String currentStateStr = currentState.name();
         switch (currentState.getStatus()) {
             case Done -> currentStateStr += " ☑";
             case Current -> currentStateStr += " ◉";
@@ -162,7 +162,8 @@ public class QueryGraph {
             }
         }
         for (Map.Entry<String, State> stringStateEntry : currentState.getNextSteps().entrySet()) {
-            String nextStep =  stringStateEntry.getKey();
+            String nextStepIRI =  stringStateEntry.getKey();
+            String nextStep = nextStepIRI.substring(nextStepIRI.lastIndexOf('#') + 1);
             State nextState  = stringStateEntry.getValue();
 
             String stepStatusString = "";

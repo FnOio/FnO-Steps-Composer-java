@@ -80,6 +80,10 @@ public class State {
         return iri;
     }
 
+    public String name() {
+        return iri.substring(iri.lastIndexOf('#') + 1);
+    }
+
     public Operator getOperator() {
         return operator;
     }
