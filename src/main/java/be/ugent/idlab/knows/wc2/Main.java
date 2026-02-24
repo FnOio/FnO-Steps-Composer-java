@@ -101,7 +101,8 @@ public class Main {
                     Files.writeString(contextOutputFile, context, StandardCharsets.UTF_8);
 
                     // Finally, compose the workflow! Print it and write to file
-                    String planStr = queryGraph.process(contextOutputFile.toString());
+                    queryGraph.process(contextOutputFile.toString());
+                    String planStr = queryGraph.printPlan();
                     System.out.println("OUTPUT:\n" + planStr);
                     Path planOutputFile = outPath.resolve("plan.txt");
                     Files.writeString(planOutputFile, planStr, StandardCharsets.UTF_8);

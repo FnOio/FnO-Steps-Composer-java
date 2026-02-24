@@ -36,9 +36,8 @@ public class QueryGraph {
     /**
      * Calculate matching states, next steps to take, ...
      * @param contextFile   The context data + reasoned knowledge
-     * @return A textual representation of the workflow.
      */
-    public String process(final String contextFile) {
+    public void process(final String contextFile) {
         Graph context = RDFDataMgr.loadGraph(contextFile);
 
         // Reset the status of all States in the graph
@@ -73,9 +72,6 @@ public class QueryGraph {
             State state = states.get(matchingState);
             markPreviousStates(state, Status.Current, null);
         }
-
-        // Generate textual representation of the plan (graph)
-        return printPlan();
     }
 
     private void markPreviousStates(State currentState, Status status, State nextState) {
@@ -129,14 +125,9 @@ public class QueryGraph {
         }
     }
 
-    private String printPlan() {
+    public String printPlan() {
         StringBuilder outStr = new StringBuilder();
         State currentState = states.get("https://w3id.org/imec/ns/fno-steps#emptyState");
-        // print current state(s)
-        //outStr.append("Current state(s):\n");
-        //states.values().stream().filter(state -> state.getStatus() == Status.Current).forEach(state -> outStr.append(state).append('\n'));
-
-        //outStr.append("\nSteps:\n");
         outStr.append(printPlan(currentState, 0));
         return outStr.toString();
     }
