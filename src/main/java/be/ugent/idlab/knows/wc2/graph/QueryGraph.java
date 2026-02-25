@@ -7,7 +7,6 @@ import org.apache.jena.shacl.ShaclValidator;
 import org.apache.jena.shacl.Shapes;
 import org.apache.jena.shacl.ValidationReport;
 import org.apache.jena.shacl.validation.ReportEntry;
-import org.apache.jena.sparql.graph.GraphFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -182,15 +181,30 @@ public class QueryGraph {
     }
 
     public String toMermaid() {
-        StringBuilder out = new StringBuilder("stateDiagram-v2\n");
+        StringBuilder out = new StringBuilder("stateDiagram-v2\n\n");
+        out.append("classDef current font-weight:bold,fill:blue,color:white\n")
+                .append("classDef done fill:#0a0,color:white\n")
+                .append("classDef deleted fill:#f55,color:white\n\n");
         State currentState = states.get("https://w3id.org/imec/ns/fno-steps#emptyState");
         out.append(toMermaid(currentState));
         return out.toString();
     }
 
     private String toMermaid(State state) {
-        String stateName = state.getPreviousStates().isEmpty() ? "[*]" : state.name();
         StringBuilder out = new StringBuilder();
+
+        String stateName;
+        if (state.getPreviousStates().isEmpty()) {
+            stateName = "[*]";
+        }
+        else {
+            stateName = state.name();
+            switch (state.getStatus()) {
+                case Deleted -> out.append("class ").append(stateName).append(" deleted\n");
+                case Done -> out.append("class ").append(stateName).append(" done\n");
+                case Current -> out.append("class ").append(stateName).append(" current\n");
+            }
+        }
 
         switch (state.getOperator()) {
             case XOR -> {
@@ -235,8 +249,8 @@ public class QueryGraph {
         return out.toString();
     }
 
-    public void toPPlan() {
-        Graph plan = GraphFactory.createDefaultGraph();
-
-    }
+//    public void toPPlan() {
+//        Graph plan = GraphFactory.createDefaultGraph();
+//
+//    }
 }

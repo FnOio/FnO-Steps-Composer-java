@@ -106,6 +106,9 @@ public class Main {
                     System.out.println("OUTPUT:\n" + planStr);
                     Path planOutputFile = outPath.resolve("plan.txt");
                     Files.writeString(planOutputFile, planStr, StandardCharsets.UTF_8);
+                    String mmd = queryGraph.toMermaid();
+                    Path mmdOutputFile = outPath.resolve("plan.mmd");
+                    Files.writeString(mmdOutputFile, mmd, StandardCharsets.UTF_8);
                 }
                 return;
             }
