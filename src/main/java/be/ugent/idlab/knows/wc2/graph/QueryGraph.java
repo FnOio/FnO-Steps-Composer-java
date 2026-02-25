@@ -7,6 +7,7 @@ import org.apache.jena.shacl.ShaclValidator;
 import org.apache.jena.shacl.Shapes;
 import org.apache.jena.shacl.ValidationReport;
 import org.apache.jena.shacl.validation.ReportEntry;
+import org.apache.jena.sparql.graph.GraphFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,6 +16,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static be.ugent.idlab.knows.wc2.graph.Operator.AND;
 import static be.ugent.idlab.knows.wc2.graph.Operator.XOR;
 
 public class QueryGraph {
@@ -24,6 +26,9 @@ public class QueryGraph {
     private final Map<String, String> shapeToState;
 
     private final Shapes shapes;
+
+    // used for generating state names when outputting mermaid
+    private int generatedStateNr = 0;
 
     public QueryGraph(final Map<String, State> states,
                       final Graph shapesGraph,
@@ -174,5 +179,64 @@ public class QueryGraph {
             outStr.append(printPlan(nextState, nextLevel));
         }
         return outStr.toString();
+    }
+
+    public String toMermaid() {
+        StringBuilder out = new StringBuilder("stateDiagram-v2\n");
+        State currentState = states.get("https://w3id.org/imec/ns/fno-steps#emptyState");
+        out.append(toMermaid(currentState));
+        return out.toString();
+    }
+
+    private String toMermaid(State state) {
+        String stateName = state.getPreviousStates().isEmpty() ? "[*]" : state.name();
+        StringBuilder out = new StringBuilder();
+
+        switch (state.getOperator()) {
+            case XOR -> {
+                // Add "choice" state
+                String generatedStateName = "choice_" + generatedStateNr++;
+                out.append("state ").append(generatedStateName).append(" <<choice>>\n");
+                out.append(stateName).append(" --> ").append(generatedStateName).append('\n');
+                stateName = generatedStateName;
+            }
+            case AND -> {
+                // Add "fork" state
+                String generatedStateName = "fork_" + generatedStateNr++;
+                out.append("state ").append(generatedStateName).append(" <<fork>>\n");
+                out.append(stateName).append(" --> ").append(generatedStateName).append('\n');
+                stateName = generatedStateName;
+            }
+            default -> { /* nothing */ }
+        }
+
+        Map<String, State> nextSteps = state.getNextSteps();
+        if (nextSteps.isEmpty()) {
+            out.append(stateName).append(" --> ").append("[*]\n");
+        } else {
+            for (Map.Entry<String, State> stringStateEntry : state.getNextSteps().entrySet()) {
+                String nextStepIRI = stringStateEntry.getKey();
+                String nextStep = nextStepIRI.substring(nextStepIRI.lastIndexOf('#') + 1);
+                State nextState = stringStateEntry.getValue();
+                String nextStateName = nextState.name();
+                if (nextState.getEndOfOperator().equals(AND)) {
+                    // Add "join" state
+                    String generatedStateName = "join_" + generatedStateNr++;
+                    out.append("state ").append(generatedStateName).append(" <<join>>\n");
+                    out.append(stateName).append(" --> ").append(generatedStateName).append('\n');
+                    stateName = generatedStateName;
+                }
+                out.append(stateName).append(" --> ").append(nextStateName)
+                        .append(" : ").append(nextStep).append('\n');
+                out.append(toMermaid(nextState));
+            }
+        }
+
+        return out.toString();
+    }
+
+    public void toPPlan() {
+        Graph plan = GraphFactory.createDefaultGraph();
+
     }
 }
