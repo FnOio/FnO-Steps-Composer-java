@@ -102,10 +102,11 @@ public class Main {
 
                     // Finally, compose the workflow! Print it and write to file
                     queryGraph.process(contextOutputFile.toString());
+                    logger.debug("Writing text plan to file");
                     String planStr = queryGraph.printPlan();
-                    System.out.println("OUTPUT:\n" + planStr);
                     Path planOutputFile = outPath.resolve("plan.txt");
                     Files.writeString(planOutputFile, planStr, StandardCharsets.UTF_8);
+                    logger.debug("Writing mermaid plan to file");
                     String mmd = queryGraph.toMermaid();
                     Path mmdOutputFile = outPath.resolve("plan.mmd");
                     Files.writeString(mmdOutputFile, mmd, StandardCharsets.UTF_8);
