@@ -2,14 +2,18 @@ package be.ugent.idlab.knows.wc2.graph;
 
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.shacl.ShaclValidator;
 import org.apache.jena.shacl.Shapes;
 import org.apache.jena.shacl.ValidationReport;
 import org.apache.jena.shacl.validation.ReportEntry;
+import org.apache.jena.sparql.graph.GraphFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.StringWriter;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -185,12 +189,12 @@ public class QueryGraph {
         out.append("classDef current font-weight:bold,fill:blue,color:white\n")
                 .append("classDef done fill:#0a0,color:white\n")
                 .append("classDef deleted fill:#f55,color:white\n\n");
-        State currentState = states.get("https://w3id.org/imec/ns/fno-steps#emptyState");
-        out.append(toMermaid(currentState));
+        State startState = states.get("https://w3id.org/imec/ns/fno-steps#emptyState");
+        out.append(toMermaid(startState));
         return out.toString();
     }
 
-    private String toMermaid(State state) {
+    private String toMermaid(final State state) {
         StringBuilder out = new StringBuilder();
 
         String stateName;
@@ -249,8 +253,47 @@ public class QueryGraph {
         return out.toString();
     }
 
-//    public void toPPlan() {
-//        Graph plan = GraphFactory.createDefaultGraph();
-//
-//    }
+    // Some stuff to help output to P-Plan
+    private final static String baseIRI = "http://localhost:8000/pplan#";
+    private final static String ppPrefix = "http://purl.org/net/p-plan#";
+    private final static String fnoStepsPrefix = "https://w3id.org/imec/ns/fno-steps#";
+
+    // subjects / objects
+    private final static Node thePlan = NodeFactory.createURI(baseIRI + "pplan");
+    private final static Node ppClass = NodeFactory.createURI(ppPrefix + "Plan");
+
+    // predicates
+    private final static Node a = NodeFactory.createURI("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
+    private final static Node stepOfPlan = NodeFactory.createURI(ppPrefix + "isStepOfPlan");
+    private final static Node usesStep = NodeFactory.createURI(fnoStepsPrefix + "usesStep");
+    private final static Node isPrecededBy = NodeFactory.createURI(fnoStepsPrefix + "isPrecededBy");
+
+
+    public String toPPlan() {
+        Graph planGraph = GraphFactory.createDefaultGraph();
+        planGraph.add(thePlan, a, ppClass);
+        // TODO: cost?
+        State startState = states.get("https://w3id.org/imec/ns/fno-steps#emptyState");
+        toPPlan(planGraph, startState, null);
+
+        StringWriter out = new StringWriter();
+        RDFDataMgr.write(out, planGraph, RDFFormat.TURTLE_BLOCKS);
+        return out.toString();
+    }
+
+    private void toPPlan(final Graph planGraph, final State state, final Node previousStep) {
+        for (Map.Entry<String, State> nextStep : state.getNextSteps().entrySet()) {
+            String fnoStepsIRI = nextStep.getKey();
+            Node fnoStep =  NodeFactory.createURI(fnoStepsIRI);
+            String ppStepIRI =  fnoStepsIRI.substring(fnoStepsIRI.lastIndexOf('#') + 1);
+            Node stepNode = NodeFactory.createURI(baseIRI + ppStepIRI);
+            planGraph.add(stepNode, stepOfPlan, thePlan);
+            planGraph.add(stepNode, usesStep, fnoStep);
+            if (previousStep != null) {
+                planGraph.add(stepNode, isPrecededBy, previousStep);
+            }
+            State nextState =  nextStep.getValue();
+            toPPlan(planGraph, nextState, stepNode);
+        }
+    }
 }

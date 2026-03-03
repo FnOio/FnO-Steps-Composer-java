@@ -110,6 +110,10 @@ public class Main {
                     String mmd = queryGraph.toMermaid();
                     Path mmdOutputFile = outPath.resolve("plan.mmd");
                     Files.writeString(mmdOutputFile, mmd, StandardCharsets.UTF_8);
+                    logger.debug("Writing P-Plan to file");
+                    String pplan = queryGraph.toPPlan();
+                    Path pplanOutputFile = outPath.resolve("plan.ttl");
+                    Files.writeString(pplanOutputFile, pplan, StandardCharsets.UTF_8);
                 }
                 return;
             }
