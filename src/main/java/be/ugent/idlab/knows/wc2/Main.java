@@ -1,6 +1,10 @@
 package be.ugent.idlab.knows.wc2;
 
 import be.ugent.idlab.knows.wc2.graph.QueryGraph;
+import be.ugent.idlab.knows.wc2.out.MermaidPlanRenderer;
+import be.ugent.idlab.knows.wc2.out.PPlanRenderer;
+import be.ugent.idlab.knows.wc2.out.PlanRenderer;
+import be.ugent.idlab.knows.wc2.out.TextPlanRenderer;
 import org.apache.commons.cli.*;
 import org.apache.commons.cli.help.HelpFormatter;
 import org.slf4j.Logger;
@@ -103,17 +107,20 @@ public class Main {
                     // Finally, compose the workflow! Print it and write to file
                     queryGraph.process(contextOutputFile.toString());
                     logger.debug("Writing text plan to file");
-                    String planStr = queryGraph.printPlan();
+                    PlanRenderer text = new TextPlanRenderer();
+                    String planStr = text.render(queryGraph);
                     Path planOutputFile = outPath.resolve("plan.txt");
                     Files.writeString(planOutputFile, planStr, StandardCharsets.UTF_8);
                     logger.debug("Writing mermaid plan to file");
-                    String mmd = queryGraph.toMermaid();
+                    PlanRenderer mermaid = new MermaidPlanRenderer();
+                    String mmd = mermaid.render(queryGraph);
                     Path mmdOutputFile = outPath.resolve("plan.mmd");
                     Files.writeString(mmdOutputFile, mmd, StandardCharsets.UTF_8);
                     logger.debug("Writing P-Plan to file");
-                    String pplan = queryGraph.toPPlan();
+                    PlanRenderer pPlan = new PPlanRenderer();
+                    String plan = pPlan.render(queryGraph);
                     Path pplanOutputFile = outPath.resolve("plan.ttl");
-                    Files.writeString(pplanOutputFile, pplan, StandardCharsets.UTF_8);
+                    Files.writeString(pplanOutputFile, plan, StandardCharsets.UTF_8);
                 }
                 return;
             }
