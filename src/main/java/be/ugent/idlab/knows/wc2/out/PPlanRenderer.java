@@ -22,7 +22,6 @@ public class PPlanRenderer implements PlanRenderer {
     private final static String fnoStepsPrefix = "https://w3id.org/imec/ns/fno-steps#";
 
     // subjects / objects
-    private final static Node thePlan = NodeFactory.createURI(baseIRI + "pplan");
     private final static Node ppClass = NodeFactory.createURI(ppPrefix + "Plan");
 
     // predicates
@@ -37,55 +36,42 @@ public class PPlanRenderer implements PlanRenderer {
         // Split plan into separate plans.
         List<List<State>> plans = splitPlan(queryGraph);
 
+        // Render each plan as a P-Plan
         Graph planGraph = GraphFactory.createDefaultGraph();
-        planGraph.add(thePlan, a, ppClass);
-        // TODO: cost?
-        // TODO: extension classes (conditionalStep, loopStep, ...)
-        // TODO: use P-Plan Entity and P-Plan Activity (an execution of process planned in a Step)
-
-        State currentState = queryGraph.getCurrentState();
-
-        toPPlan(planGraph, currentState, null);
+        int plan_nr = 1;
+        for (List<State> plan : plans) {
+            Node thePlan = NodeFactory.createURI(baseIRI + "pplan_" + plan_nr);
+            planGraph.add(thePlan, a, ppClass);
+            Node previousStep = null;
+            for (State state : plan) {
+                if (!state.getNextSteps().isEmpty()) {
+                    String step = state.getNextSteps().entrySet().stream()
+                            .filter(stepToState -> plan.contains(stepToState.getValue()))
+                            .map(Map.Entry::getKey)
+                            .toList().getFirst();
+                    Node fnoStep =  NodeFactory.createURI(step);
+                    String ppStepIRI =  step.substring(step.lastIndexOf('#') + 1);
+                    Node stepNode = NodeFactory.createURI(baseIRI + ppStepIRI + '_' + plan_nr);
+                    planGraph.add(stepNode, stepOfPlan, thePlan);
+                    planGraph.add(stepNode, usesStep, fnoStep);
+                    if (previousStep != null) {
+                        planGraph.add(stepNode, isPrecededBy, previousStep);
+                    }
+                    previousStep = stepNode;
+                }
+            }
+            plan_nr++;
+        }
         StringWriter out = new StringWriter();
         RDFDataMgr.write(out, planGraph, RDFFormat.TURTLE_BLOCKS);
         return out.toString();
     }
 
-    private void toPPlan(final Graph planGraph, final State state, final Node previousStep) {
-        for (Map.Entry<String, State> nextStep : state.getNextSteps().entrySet()) {
-
-            switch (state.getOperator()) {
-                case AND -> {
-                    // SplitStep
-                    System.out.println();
-                }
-                case XOR -> {
-                    // ConditionalStep
-                    // The condition is a certain shape that matches
-                    System.out.println();
-                    // The "then" and "else" steps are the next steps of this state
-                }
-            }
-
-            String fnoStepsIRI = nextStep.getKey();
-            Node fnoStep =  NodeFactory.createURI(fnoStepsIRI);
-            String ppStepIRI =  fnoStepsIRI.substring(fnoStepsIRI.lastIndexOf('#') + 1);
-            Node stepNode = NodeFactory.createURI(baseIRI + ppStepIRI);
-            planGraph.add(stepNode, stepOfPlan, thePlan);
-            planGraph.add(stepNode, usesStep, fnoStep);
-            if (previousStep != null) {
-                planGraph.add(stepNode, isPrecededBy, previousStep);
-            }
-            State nextState =  nextStep.getValue();
-            toPPlan(planGraph, nextState, stepNode);
-        }
-    }
-
     /**
      * Splits a plan into separate plans. This happens when there are exclusive OR paths in the plan: each such path
-     * is a separate
-     * @param queryGraph
-     * @return
+     * is a separate plan.
+     * @param queryGraph The graph of states and steps
+     * @return  A list of plans. Each plan is a list of States
      */
     private static List<List<State>> splitPlan(final QueryGraph queryGraph) {
         List<List<State>> plans = new ArrayList<>(1);
