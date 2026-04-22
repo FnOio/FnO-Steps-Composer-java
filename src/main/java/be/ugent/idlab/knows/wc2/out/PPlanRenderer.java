@@ -34,7 +34,7 @@ public class PPlanRenderer implements PlanRenderer {
     @Override
     public String render(final QueryGraph queryGraph) {
         // Split plan into separate plans.
-        List<List<State>> plans = splitPlan(queryGraph);
+        List<Set<State>> plans = splitPlan(queryGraph);
 
         // Render each plan as a P-Plan
         Graph planGraph = GraphFactory.createDefaultGraph();
@@ -73,16 +73,16 @@ public class PPlanRenderer implements PlanRenderer {
      * @param queryGraph The graph of states and steps
      * @return  A list of plans. Each plan is a list of States
      */
-    private static List<List<State>> splitPlan(final QueryGraph queryGraph) {
-        List<List<State>> plans = new ArrayList<>(1);
-        plans.add(new LinkedList<>());
+    private static List<Set<State>> splitPlan(final QueryGraph queryGraph) {
+        List<Set<State>> plans = new ArrayList<>(1);
+        plans.add(new HashSet<>());
         splitPlan(queryGraph, queryGraph.getCurrentState(), plans);
         return plans;
     }
 
-    private static void splitPlan(final QueryGraph queryGraph, final State currentState, final List<List<State>> plans) {
+    private static void splitPlan(final QueryGraph queryGraph, final State currentState, final List<Set<State>> plans) {
         // add current state to latest plan
-        List<State> currentPlan = plans.getLast();
+        Set<State> currentPlan = plans.getLast();
         currentPlan.add(currentState);
 
         // If the operator is XOR, then a new plan will be created
@@ -95,7 +95,7 @@ public class PPlanRenderer implements PlanRenderer {
 
             // The rest needs new plans
             nextStateIter.forEachRemaining(nextState -> {
-                List<State> newPlan = new LinkedList<>();
+                Set<State> newPlan = new HashSet<>();
                 addPreviousStatesToPlan(nextState, newPlan);
                 plans.add(newPlan);
                 splitPlan(queryGraph, nextState, plans);
@@ -109,9 +109,9 @@ public class PPlanRenderer implements PlanRenderer {
         }
     }
 
-    private static void addPreviousStatesToPlan(final State currentState, final List<State> plan) {
+    private static void addPreviousStatesToPlan(final State currentState, final Set<State> plan) {
+        plan.add(currentState);
         for (State previousState : currentState.getPreviousStates()) {
-            plan.addFirst(previousState);
             addPreviousStatesToPlan(previousState, plan);
         }
     }
