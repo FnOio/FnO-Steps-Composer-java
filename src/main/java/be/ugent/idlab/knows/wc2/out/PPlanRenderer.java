@@ -35,7 +35,7 @@ public class PPlanRenderer implements PlanRenderer {
     @Override
     public String render(final QueryGraph queryGraph) {
         // Split plan into separate plans.
-        List<Set<State>> plans = splitPlan(queryGraph);
+        List<List<State>> plans = splitPlan(queryGraph);
 
         Graph planGraph = GraphFactory.createDefaultGraph();
         planGraph.add(thePlan, a, ppClass);
@@ -87,16 +87,16 @@ public class PPlanRenderer implements PlanRenderer {
      * @param queryGraph
      * @return
      */
-    private static List<Set<State>> splitPlan(final QueryGraph queryGraph) {
-        List<Set<State>> plans = new ArrayList<>(1);
-        plans.add(new HashSet<>());
+    private static List<List<State>> splitPlan(final QueryGraph queryGraph) {
+        List<List<State>> plans = new ArrayList<>(1);
+        plans.add(new LinkedList<>());
         splitPlan(queryGraph, queryGraph.getCurrentState(), plans);
         return plans;
     }
 
-    private static void splitPlan(final QueryGraph queryGraph, final State currentState, final List<Set<State>> plans) {
+    private static void splitPlan(final QueryGraph queryGraph, final State currentState, final List<List<State>> plans) {
         // add current state to latest plan
-        Set<State> currentPlan = plans.getLast();
+        List<State> currentPlan = plans.getLast();
         currentPlan.add(currentState);
 
         // If the operator is XOR, then a new plan will be created
@@ -109,7 +109,7 @@ public class PPlanRenderer implements PlanRenderer {
 
             // The rest needs new plans
             nextStateIter.forEachRemaining(nextState -> {
-                Set<State> newPlan = new HashSet<>();
+                List<State> newPlan = new LinkedList<>();
                 addPreviousStatesToPlan(nextState, newPlan);
                 plans.add(newPlan);
                 splitPlan(queryGraph, nextState, plans);
@@ -123,9 +123,9 @@ public class PPlanRenderer implements PlanRenderer {
         }
     }
 
-    private static void addPreviousStatesToPlan(final State currentState, final Set<State> plan) {
-        plan.add(currentState);
+    private static void addPreviousStatesToPlan(final State currentState, final List<State> plan) {
         for (State previousState : currentState.getPreviousStates()) {
+            plan.addFirst(previousState);
             addPreviousStatesToPlan(previousState, plan);
         }
     }
