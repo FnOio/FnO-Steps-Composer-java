@@ -2,7 +2,6 @@ package be.ugent.idlab.knows.wc2.out;
 
 import be.ugent.idlab.knows.wc2.graph.QueryGraph;
 import be.ugent.idlab.knows.wc2.graph.State;
-import be.ugent.idlab.knows.wc2.graph.Status;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
@@ -11,7 +10,9 @@ import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.sparql.graph.GraphFactory;
 
 import java.io.StringWriter;
-import java.util.Map;
+import java.util.*;
+
+import static be.ugent.idlab.knows.wc2.graph.Operator.XOR;
 
 public class PPlanRenderer implements PlanRenderer {
 
@@ -33,22 +34,16 @@ public class PPlanRenderer implements PlanRenderer {
 
     @Override
     public String render(final QueryGraph queryGraph) {
+        // Split plan into separate plans.
+        List<Set<State>> plans = splitPlan(queryGraph);
+
         Graph planGraph = GraphFactory.createDefaultGraph();
         planGraph.add(thePlan, a, ppClass);
         // TODO: cost?
         // TODO: extension classes (conditionalStep, loopStep, ...)
         // TODO: use P-Plan Entity and P-Plan Activity (an execution of process planned in a Step)
 
-        State currentState = null;
-        for (State state : queryGraph.getStates().values()) {
-            if (state.getStatus().equals(Status.Current)) {
-                currentState = state;
-                break;
-            }
-        }
-        if (currentState == null) {
-            return "";
-        }
+        State currentState = queryGraph.getCurrentState();
 
         toPPlan(planGraph, currentState, null);
         StringWriter out = new StringWriter();
@@ -83,6 +78,55 @@ public class PPlanRenderer implements PlanRenderer {
             }
             State nextState =  nextStep.getValue();
             toPPlan(planGraph, nextState, stepNode);
+        }
+    }
+
+    /**
+     * Splits a plan into separate plans. This happens when there are exclusive OR paths in the plan: each such path
+     * is a separate
+     * @param queryGraph
+     * @return
+     */
+    private static List<Set<State>> splitPlan(final QueryGraph queryGraph) {
+        List<Set<State>> plans = new ArrayList<>(1);
+        plans.add(new HashSet<>());
+        splitPlan(queryGraph, queryGraph.getCurrentState(), plans);
+        return plans;
+    }
+
+    private static void splitPlan(final QueryGraph queryGraph, final State currentState, final List<Set<State>> plans) {
+        // add current state to latest plan
+        Set<State> currentPlan = plans.getLast();
+        currentPlan.add(currentState);
+
+        // If the operator is XOR, then a new plan will be created
+        if (currentState.getOperator().equals(XOR)) {
+            Iterator<State> nextStateIter = currentState.getNextSteps().values().iterator();
+
+            // The first state of the next states can be added to the current plan
+            State firstNextState = nextStateIter.next();
+            splitPlan(queryGraph, firstNextState, plans);
+
+            // The rest needs new plans
+            nextStateIter.forEachRemaining(nextState -> {
+                Set<State> newPlan = new HashSet<>();
+                addPreviousStatesToPlan(nextState, newPlan);
+                plans.add(newPlan);
+                splitPlan(queryGraph, nextState, plans);
+            });
+
+        } else {
+            // Just add every next state to the current plan
+            for (State nextState : currentState.getNextSteps().values()) {
+                splitPlan(queryGraph, nextState, plans);
+            }
+        }
+    }
+
+    private static void addPreviousStatesToPlan(final State currentState, final Set<State> plan) {
+        plan.add(currentState);
+        for (State previousState : currentState.getPreviousStates()) {
+            addPreviousStatesToPlan(previousState, plan);
         }
     }
 }

@@ -10,7 +10,7 @@ public class TextPlanRenderer implements PlanRenderer {
     @Override
     public String render(final QueryGraph queryGraph) {
         StringBuilder outStr = new StringBuilder();
-        State currentState = queryGraph.getStates().get("https://w3id.org/imec/ns/fno-steps#emptyState");
+        State currentState = queryGraph.getStartState();
         outStr.append(printPlan(currentState, 0));
         return outStr.toString();
     }

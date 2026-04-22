@@ -33,8 +33,22 @@ public class QueryGraph {
         shapes = Shapes.parse(shapesGraph);
     }
 
-    public Map<String, State> getStates() {
-        return states;
+    public State getStartState() {
+        return states.get("https://w3id.org/imec/ns/fno-steps#emptyState");
+    }
+
+    public State getCurrentState() {
+        State currentState = null;
+        for (State state : states.values()) {
+            if (state.getStatus().equals(Status.Current)) {
+                currentState = state;
+                break;
+            }
+        }
+        if (currentState == null) {
+            currentState = getStartState();
+        }
+        return currentState;
     }
 
     /**

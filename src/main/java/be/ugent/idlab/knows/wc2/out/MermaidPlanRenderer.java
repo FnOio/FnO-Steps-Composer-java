@@ -17,7 +17,7 @@ public class MermaidPlanRenderer implements PlanRenderer {
         out.append("classDef current font-weight:bold,fill:blue,color:white\n")
                 .append("classDef done fill:#0a0,color:white\n")
                 .append("classDef deleted fill:#f55,color:white\n\n");
-        State startState = queryGraph.getStates().get("https://w3id.org/imec/ns/fno-steps#emptyState");
+        State startState = queryGraph.getStartState();
         out.append(toMermaid(startState));
         return out.toString();
     }
