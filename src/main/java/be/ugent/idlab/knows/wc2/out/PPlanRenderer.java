@@ -2,6 +2,7 @@ package be.ugent.idlab.knows.wc2.out;
 
 import be.ugent.idlab.knows.wc2.graph.QueryGraph;
 import be.ugent.idlab.knows.wc2.graph.State;
+import be.ugent.idlab.knows.wc2.graph.Status;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
@@ -38,28 +39,12 @@ public class PPlanRenderer implements PlanRenderer {
 
         // Render each plan as a P-Plan
         Graph planGraph = GraphFactory.createDefaultGraph();
+        State currentState = queryGraph.getCurrentState();
         int plan_nr = 1;
-        for (List<State> plan : plans) {
+        for (Set<State> plan : plans) {
             Node thePlan = NodeFactory.createURI(baseIRI + "pplan_" + plan_nr);
             planGraph.add(thePlan, a, ppClass);
-            Node previousStep = null;
-            for (State state : plan) {
-                if (!state.getNextSteps().isEmpty()) {
-                    String step = state.getNextSteps().entrySet().stream()
-                            .filter(stepToState -> plan.contains(stepToState.getValue()))
-                            .map(Map.Entry::getKey)
-                            .toList().getFirst();
-                    Node fnoStep =  NodeFactory.createURI(step);
-                    String ppStepIRI =  step.substring(step.lastIndexOf('#') + 1);
-                    Node stepNode = NodeFactory.createURI(baseIRI + ppStepIRI + '_' + plan_nr);
-                    planGraph.add(stepNode, stepOfPlan, thePlan);
-                    planGraph.add(stepNode, usesStep, fnoStep);
-                    if (previousStep != null) {
-                        planGraph.add(stepNode, isPrecededBy, previousStep);
-                    }
-                    previousStep = stepNode;
-                }
-            }
+            renderPlan(planGraph, plan, plan_nr, thePlan, currentState, null);
             plan_nr++;
         }
         StringWriter out = new StringWriter();
@@ -67,11 +52,41 @@ public class PPlanRenderer implements PlanRenderer {
         return out.toString();
     }
 
+    private void renderPlan(final Graph planGraph,
+                            final Set<State> plan,
+                            final int planNr,
+                            final Node thePlan,
+                            final State currentState,
+                            final Node previousStep) {
+
+        // the steps starting from this state
+        List<String> steps = currentState.getNextSteps().entrySet().stream()
+                .filter(stepToState -> plan.contains(stepToState.getValue()))
+                .map(Map.Entry::getKey)
+                .toList();
+
+        for (String step : steps) {
+            Node fnoStep =  NodeFactory.createURI(step);
+            String ppStepIRI =  step.substring(step.lastIndexOf('#') + 1);
+            Node stepNode = NodeFactory.createURI(baseIRI + ppStepIRI + '_' + planNr);
+            planGraph.add(stepNode, stepOfPlan, thePlan);
+            planGraph.add(stepNode, usesStep, fnoStep);
+            if (previousStep != null) {
+                planGraph.add(stepNode, isPrecededBy, previousStep);
+            }
+            State nextState = currentState.getNextSteps().get(step);
+            // get every the state of this step and recursively repeat
+            renderPlan(planGraph, plan, planNr, thePlan, nextState, stepNode);
+        }
+    }
+
+
+
     /**
      * Splits a plan into separate plans. This happens when there are exclusive OR paths in the plan: each such path
      * is a separate plan.
      * @param queryGraph The graph of states and steps
-     * @return  A list of plans. Each plan is a list of States
+     * @return  A list of plans. Each plan is a set of States
      */
     private static List<Set<State>> splitPlan(final QueryGraph queryGraph) {
         List<Set<State>> plans = new ArrayList<>(1);
@@ -110,9 +125,11 @@ public class PPlanRenderer implements PlanRenderer {
     }
 
     private static void addPreviousStatesToPlan(final State currentState, final Set<State> plan) {
-        plan.add(currentState);
         for (State previousState : currentState.getPreviousStates()) {
-            addPreviousStatesToPlan(previousState, plan);
+            if (!previousState.getStatus().equals(Status.Done) && !previousState.getStatus().equals(Status.Deleted)) {
+                plan.add(previousState);
+                addPreviousStatesToPlan(previousState, plan);
+            }
         }
     }
 }
