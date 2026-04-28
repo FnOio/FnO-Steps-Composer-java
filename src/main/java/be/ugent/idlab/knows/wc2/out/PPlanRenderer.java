@@ -30,6 +30,7 @@ public class PPlanRenderer implements PlanRenderer {
     private final static Node stepOfPlan = NodeFactory.createURI(ppPrefix + "isStepOfPlan");
     private final static Node usesStep = NodeFactory.createURI(fnoStepsPrefix + "usesStep");
     private final static Node isPrecededBy = NodeFactory.createURI(fnoStepsPrefix + "isPrecededBy");
+    private final static Node hasCost = NodeFactory.createURI(fnoStepsPrefix + "cost");
 
 
     @Override
@@ -44,7 +45,9 @@ public class PPlanRenderer implements PlanRenderer {
         for (Set<State> plan : plans) {
             Node thePlan = NodeFactory.createURI(baseIRI + "pplan_" + plan_nr);
             planGraph.add(thePlan, a, ppClass);
-            renderPlan(planGraph, plan, plan_nr, thePlan, currentState, null);
+            int cost = renderPlan(planGraph, plan, plan_nr, thePlan, currentState, null);
+            // For now, the cost is just the number of steps involved in the plan
+            planGraph.add(thePlan, hasCost, NodeFactory.createLiteralByValue(cost));
             plan_nr++;
         }
         StringWriter out = new StringWriter();
@@ -52,7 +55,7 @@ public class PPlanRenderer implements PlanRenderer {
         return out.toString();
     }
 
-    private void renderPlan(final Graph planGraph,
+    private int renderPlan(final Graph planGraph,
                             final Set<State> plan,
                             final int planNr,
                             final Node thePlan,
@@ -65,6 +68,8 @@ public class PPlanRenderer implements PlanRenderer {
                 .map(Map.Entry::getKey)
                 .toList();
 
+        int cost = steps.size();
+
         for (String step : steps) {
             Node fnoStep =  NodeFactory.createURI(step);
             String ppStepIRI =  step.substring(step.lastIndexOf('#') + 1);
@@ -76,8 +81,9 @@ public class PPlanRenderer implements PlanRenderer {
             }
             State nextState = currentState.getNextSteps().get(step);
             // get every the state of this step and recursively repeat
-            renderPlan(planGraph, plan, planNr, thePlan, nextState, stepNode);
+            cost += renderPlan(planGraph, plan, planNr, thePlan, nextState, stepNode);
         }
+        return cost;
     }
 
 
