@@ -1,0 +1,7 @@
+State: emptyState ☑
+Step:  goToTrafficLight ☑
+State: atTrafficLight ◉
+Step:  waitUntilGreen ☐
+State: lightIsGreen
+Step:  reachDestination ☐
+State: atDestination

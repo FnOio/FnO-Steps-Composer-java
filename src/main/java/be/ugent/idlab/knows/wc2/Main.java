@@ -1,24 +1,11 @@
 package be.ugent.idlab.knows.wc2;
 
-import be.ugent.idlab.knows.wc2.graph.QueryGraph;
-import be.ugent.idlab.knows.wc2.out.MermaidPlanRenderer;
-import be.ugent.idlab.knows.wc2.out.PPlanRenderer;
-import be.ugent.idlab.knows.wc2.out.PlanRenderer;
-import be.ugent.idlab.knows.wc2.out.TextPlanRenderer;
 import org.apache.commons.cli.*;
 import org.apache.commons.cli.help.HelpFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
 
 public class Main {
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
@@ -50,78 +37,12 @@ public class Main {
                     logger.debug("=====================");
                 }
 
-                Path scenarioDir = Path.of(cli.getOptionValue("input-dir")).toAbsolutePath();
-                Path shapesPath = scenarioDir.resolve("shapes.ttl");
-                Path statesPath = scenarioDir.resolve("states.ttl");
-                Path stepsPath = scenarioDir.resolve("steps.ttl");
-                Path goalStatesPath = scenarioDir.resolve("goalStates.txt");
-                Path outRootPath = cli.hasOption("output-dir") ? Paths.get(cli.getOptionValue("output-dir")) : scenarioDir.resolve("output");
+                API.run(cli.getOptionValue("input-dir"),
+                        cli.getOptionValue("output-dir"),
+                        cli.getOptionValue("eye-bin"),
+                        cli.getOptionValue("reasoning-file"),
+                        cli.getOptionValue("context"));
 
-                String eyeBinPath = cli.hasOption("eye-bin") ? cli.getOptionValue("eye-bin") : "eye";
-
-                logger.debug("Scenario directory: {}", scenarioDir);
-
-                // Get context file(s)
-                List<String> contextFileNames = new LinkedList<>();
-                if (cli.hasOption("context")) {
-                    contextFileNames.add(cli.getOptionValue("context"));
-                } else {
-                    contextFileNames = Arrays.stream(scenarioDir.toFile().listFiles())
-                            .map(File::getName)
-                            .filter(name -> name.startsWith("data_"))
-                            .sorted()
-                            .toList();
-                }
-
-                logger.debug("Context files: {}", contextFileNames);
-
-                // Initialize QueryGraph once; use it for each context file.
-                QueryGraphBuilder queryGraphBuilder = QueryGraphBuilder.create(stepsPath.toString(), goalStatesPath.toString(), shapesPath.toString(), statesPath.toString());
-                QueryGraph queryGraph = queryGraphBuilder.build();
-
-                // Loop over context files
-                for (String contextFileName : contextFileNames) {
-                    logger.info("Processing {}", contextFileName);
-                    Path contextPath = scenarioDir.resolve(contextFileName);
-
-                    // Get output directory and create if it doesn't exist
-                    Path outPath = outRootPath;
-                    if (contextFileNames.size() > 1) {
-                        outPath = outRootPath.resolve(contextFileName.substring(0, contextFileName.lastIndexOf('.')));
-                    }
-                    Path contextOutputFile = outPath.resolve("context_after_reasoning.ttl");
-                    Files.createDirectories(contextOutputFile.getParent());
-
-                    // Apply reasoning to context, if some n3 file is given. Add these to the context
-                    String context = Files.readString(contextPath);
-                    if (cli.hasOption("reasoning-file")) {
-                        Path reasoningFilePath = scenarioDir.resolve(cli.getOptionValue("reasoning-file"));
-                        String extraTriples = new ReasonerWrapper(eyeBinPath).run(contextPath.toString(), reasoningFilePath.toString());
-                        if (!extraTriples.isEmpty()) {
-                            logger.debug("Extra triples found!");
-                            context += extraTriples;
-                        }
-                    }
-                    Files.writeString(contextOutputFile, context, StandardCharsets.UTF_8);
-
-                    // Finally, compose the workflow! Print it and write to file
-                    queryGraph.process(contextOutputFile.toString());
-                    logger.debug("Writing text plan to file");
-                    PlanRenderer text = new TextPlanRenderer();
-                    String planStr = text.render(queryGraph);
-                    Path planOutputFile = outPath.resolve("plan.txt");
-                    Files.writeString(planOutputFile, planStr, StandardCharsets.UTF_8);
-                    logger.debug("Writing mermaid plan to file");
-                    PlanRenderer mermaid = new MermaidPlanRenderer();
-                    String mmd = mermaid.render(queryGraph);
-                    Path mmdOutputFile = outPath.resolve("plan.mmd");
-                    Files.writeString(mmdOutputFile, mmd, StandardCharsets.UTF_8);
-                    logger.debug("Writing P-Plan to file");
-                    PlanRenderer pPlan = new PPlanRenderer();
-                    String plan = pPlan.render(queryGraph);
-                    Path pplanOutputFile = outPath.resolve("plan.ttl");
-                    Files.writeString(pplanOutputFile, plan, StandardCharsets.UTF_8);
-                }
                 return;
             }
         }

@@ -1,0 +1,10 @@
+State: emptyState ◉
+AND
+Step:  getHat ☐
+  State: hasHat
+  Step:  hike ☐
+  State: reachedB
+Step:  getHikingGear ☐
+  State: hasHikingGear
+  Step:  hike ☐
+  State: reachedB

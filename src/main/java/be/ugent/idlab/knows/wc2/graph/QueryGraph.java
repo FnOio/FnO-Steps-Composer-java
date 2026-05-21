@@ -37,20 +37,6 @@ public class QueryGraph {
         return states.get("https://w3id.org/imec/ns/fno-steps#emptyState");
     }
 
-    public State getCurrentState() {
-        State currentState = null;
-        for (State state : states.values()) {
-            if (state.getStatus().equals(Status.Current)) {
-                currentState = state;
-                break;
-            }
-        }
-        if (currentState == null) {
-            currentState = getStartState();
-        }
-        return currentState;
-    }
-
     /**
      * Calculate matching states, next steps to take, ...
      * @param contextFile   The context data + reasoned knowledge
@@ -62,24 +48,29 @@ public class QueryGraph {
         State startState = states.get("https://w3id.org/imec/ns/fno-steps#emptyState");
         resetStatus(startState);
 
-        // Which shapes/states DO NOT match the context (invalid)?
-        Set<String> nonMatchingShapes = new HashSet<>();
+        // Check for matching shapes
         ValidationReport report = ShaclValidator.get().validate(shapes, context);
-        for (ReportEntry entry : report.getEntries()) {
-            Node condextNode = entry.focusNode(); // The matching context node
-            Node shapeNode = entry.source();
-            logger.debug("{} does NOT match {}", condextNode, shapeNode);
-            nonMatchingShapes.add(shapeNode.getURI());
-        }
-
-        // Mark nodes in the graph with their status
         Set<String> matchingShapes = new HashSet<>(shapeToState.keySet());
-        if (report.getEntries().isEmpty()) {
-            logger.debug("No matching shapes found");
-            matchingShapes.clear();
+        if (report.conforms()) {
+            logger.debug("All shapes match!");
         } else {
-            // just remove the non-matching shapes
-            matchingShapes.removeAll(nonMatchingShapes);
+            // Which shapes/states DO NOT match the context (invalid)?
+            Set<String> nonMatchingShapes = new HashSet<>();
+            for (ReportEntry entry : report.getEntries()) {
+                Node condextNode = entry.focusNode(); // The matching context node
+                Node shapeNode = entry.source();
+                logger.debug("{} does NOT match {}", condextNode, shapeNode);
+                nonMatchingShapes.add(shapeNode.getURI());
+            }
+            // Mark nodes in the graph with their status
+            if (report.getEntries().isEmpty()) {
+                logger.debug("No matching shapes found");
+                matchingShapes.clear();
+            } else {
+                // just remove the non-matching shapes
+                matchingShapes.removeAll(nonMatchingShapes);
+            }
+
         }
         Set<String> matchingStates = matchingShapes.stream().map(shapeToState::get).collect(Collectors.toSet());
         // add the emptyState (start state) to the matching states
@@ -117,17 +108,12 @@ public class QueryGraph {
     }
 
     private void pruneForwardUntilEndXOR(State currentState, int xorLevel) {
-        if (currentState.getNextSteps().isEmpty()) {
-            currentState.setStatus(Status.Deleted);
-            return;
-        }
         if (currentState.getOperator().equals(XOR)) {
             xorLevel++;
         } else if (currentState.getEndOfOperator().equals(XOR)) {
-            if (xorLevel == 0) {
+            xorLevel--;
+            if (xorLevel <= 0) {
                 return;
-            } else {
-                xorLevel--;
             }
         }
         currentState.setStatus(Status.Deleted);

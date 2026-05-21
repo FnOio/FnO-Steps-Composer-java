@@ -1,0 +1,7 @@
+<http://localhost:8000/pplan#pplan_1>
+        <https://w3id.org/imec/ns/fno-steps#cost>  "1"^^<http://www.w3.org/2001/XMLSchema#int>;
+        a       <http://purl.org/net/p-plan#Plan> .
+
+<http://localhost:8000/pplan#reachDestination_1>
+        <https://w3id.org/imec/ns/fno-steps#usesStep>  <http://localhost:8000/steps#reachDestination>;
+        <http://purl.org/net/p-plan#isStepOfPlan>  <http://localhost:8000/pplan#pplan_1> .

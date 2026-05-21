@@ -1,0 +1,19 @@
+PREFIX fno-steps: <https://w3id.org/imec/ns/fno-steps#>
+PREFIX : <http://localhost:8000/states#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX shapes: <http://localhost:8000/shapes#>
+
+:atDestination
+    a fno-steps:State ;
+    rdfs:label "Destination reached." ;
+    fno-steps:hasStateShape shapes:atDestination .
+
+:atTrafficLight
+    a fno-steps:State ;
+    rdfs:label "Standing at a traffic light, waiting for it to become green because it's red!" ;
+    fno-steps:hasStateShape shapes:atTrafficLight .
+
+:lightIsGreen
+    a fno-steps:State ;
+    rdfs:label "Yay, the light turned green!" ;
+    fno-steps:hasStateShape shapes:lightIsGreen .

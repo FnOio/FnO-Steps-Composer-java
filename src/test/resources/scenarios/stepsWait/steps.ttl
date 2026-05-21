@@ -1,0 +1,40 @@
+PREFIX fno-steps: <https://w3id.org/imec/ns/fno-steps#>
+PREFIX states: <http://localhost:8000/states#>
+PREFIX skos: <http://www.w3.org/2008/05/skos-xl#>
+PREFIX : <http://localhost:8000/steps#>
+
+:goToDestination
+    a fno-steps:ContainerLevelStep, fno-steps:JourneyLevelStep ;
+    fno-steps:hasDescription :goToDestinationDescription ;
+    fno-steps:producesState states:atDestination ;
+    fno-steps:requiresState fno-steps:emptyState .
+
+:goToDestinationDescription
+    skos:literalForm "Go to the destination via a traffic light, wait for it to become green" .
+
+:goToTrafficLight
+    a fno-steps:ComponentLevelStep ;
+    fno-steps:hasDescription :goToTrafficLightDescription ;
+    fno-steps:producesState states:atTrafficLight ;
+    fno-steps:requiresState fno-steps:emptyState .
+
+:goToTrafficLightDescription
+    skos:literalForm "Go to the traffic light, which is red" .
+
+:reachDestination
+    a fno-steps:ComponentLevelStep ;
+    fno-steps:hasDescription :reachDestinationDescription ;
+    fno-steps:producesState states:atDestination ;
+    fno-steps:requiresState states:lightIsGreen .
+
+:reachDestinationDescription
+    skos:literalForm "When the light is green, go to destination" .
+
+:waitUntilGreen
+    a fno-steps:ComponentLevelStep ;
+    fno-steps:hasDescription :waitUntilGreenDescription ;
+    fno-steps:producesState states:lightIsGreen ;
+    fno-steps:requiresState states:atTrafficLight .
+
+:waitUntilGreenDescription
+    skos:literalForm "Wait until the light is green." .

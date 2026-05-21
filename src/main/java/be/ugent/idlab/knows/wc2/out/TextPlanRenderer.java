@@ -50,7 +50,13 @@ public class TextPlanRenderer implements PlanRenderer {
                         stepStatusString = " ☑";
                     }
                 }
-                case Todo ->  stepStatusString = " ☐";
+                case Todo ->  {
+                    if (currentState.getStatus() == Status.Deleted) {
+                        stepStatusString = " ☒";
+                    } else {
+                        stepStatusString = " ☐";
+                    }
+                }
             }
 
             outStr.append(("Step:  " + nextStep + stepStatusString).indent(level * 2));

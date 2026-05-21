@@ -1,0 +1,13 @@
+---
+title: AND  use fork
+---
+stateDiagram-v2
+    state fork <<fork>>
+    [*] --> fork
+    fork --> hasHat : get_hat
+    fork --> hasHikingGear : get_hiking_gear
+    state join <<join>>
+    hasHat --> join
+    hasHikingGear --> join
+    join --> reachedB : hike
+    reachedB --> [*]

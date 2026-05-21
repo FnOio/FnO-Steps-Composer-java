@@ -1,0 +1,53 @@
+PREFIX : <http://localhost:8000/shapes#>
+PREFIX fno-steps: <https://w3id.org/imec/ns/fno-steps#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX sh: <http://www.w3.org/ns/shacl#>
+PREFIX persoon: <https://data.vlaanderen.be/ns/persoon#>
+PREFIX xmls: <http://www.w3.org/2001/XMLSchema#>
+PREFIX ex: <http://example.com/ns#>
+
+:atDestination
+    a fno-steps:StateShape ;
+    rdfs:label "TODO: provide a description" ;
+    sh:property :atDestinationPropertyShape ;
+    sh:targetClass persoon:Inwoner .
+
+:atDestinationPropertyShape
+    a sh:PropertyShape ;
+    rdfs:label "TODO: provide a description" ;
+    sh:datatype xmls:boolean ;
+    sh:maxCount 1 ;
+    sh:minCount 1 ;
+    sh:path ex:hasatDestination ;
+    sh:pattern "true" .
+
+:atTrafficLight
+    a fno-steps:StateShape ;
+    rdfs:label "TODO: provide a description" ;
+    sh:property :atTrafficLightPropertyShape ;
+    sh:targetClass persoon:Inwoner .
+
+:atTrafficLightPropertyShape
+    a sh:PropertyShape ;
+    rdfs:label "TODO: provide a description" ;
+    sh:datatype xmls:boolean ;
+    sh:maxCount 1 ;
+    sh:minCount 1 ;
+    sh:path ex:atTrafficLight ;
+    sh:pattern "true" .
+
+:lightIsGreen
+    a fno-steps:StateShape ;
+    rdfs:label "TODO: provide a description" ;
+    sh:property :lightIsGreenPropertyShape ;
+    sh:targetClass ex:TrafficLight .
+
+:lightIsGreenPropertyShape
+    a sh:PropertyShape ;
+    rdfs:label "TODO: provide a description" ;
+    sh:datatype xmls:boolean ;
+    sh:maxCount 1 ;
+    sh:minCount 1 ;
+    sh:path ex:isGreen ;
+    sh:pattern "true" .
+

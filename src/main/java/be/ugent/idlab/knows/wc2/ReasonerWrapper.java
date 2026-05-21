@@ -3,14 +3,9 @@ package be.ugent.idlab.knows.wc2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.concurrent.*;
 
@@ -27,38 +22,16 @@ public class ReasonerWrapper {
      * @param inputFiles Data and rules, contained in these N3 files.
      */
     public String run(String ...inputFiles) throws IOException, RuntimeException, InterruptedException, ExecutionException, TimeoutException {
-        //return runEye(inputFiles);
         return runEyeling(inputFiles);
     }
 
     private String runEyeling(String ...inputFiles) throws IOException, ExecutionException, InterruptedException, TimeoutException {
-        // Put all data into one file
-        logger.debug("Running eyeling on input files {}", Arrays.asList(inputFiles));
-        Path tmpFile = Files.createTempFile("dataforreasoner", ".n3");
-        tmpFile.toFile().deleteOnExit();
-        try (FileChannel inputForReasoner = new FileOutputStream(tmpFile.toFile()).getChannel()) {
-            long pos = 0;
-            for (String inputFile : inputFiles) {
-                try (FileChannel dataFile = new FileInputStream(inputFile).getChannel()) {
-                    long fileLength = dataFile.size();
-                    inputForReasoner.transferFrom(dataFile, pos, fileLength);
-                    pos += fileLength;
-                }
-            }
-        }
-
-        // Use that file as input for eyeling
-        //return runCommand(new String[]{"/home/geraldh/.bun/bin/bunx", "eyeling", tmpFile.toString()});
-        return runCommand(new String[]{eyeBinPath, tmpFile.toString()});
+        if (logger.isDebugEnabled()) logger.debug("Running eye(ling) with input files {}", Arrays.stream(inputFiles).toList());
+        String[] command = new String[inputFiles.length + 1];
+        command[0] = eyeBinPath;
+        System.arraycopy(inputFiles, 0, command, 1, inputFiles.length);
+        return runCommand(command);
     }
-
-//    private String runEye(String ...inputFiles) throws IOException, ExecutionException, InterruptedException, TimeoutException {
-//        //Arrays.stream(inputFiles)
-//        String[] commandArgs = new String[inputFiles.length + 4];
-//        System.arraycopy(new String[]{eyeBinPath, "--nope", "--pass-only-new", "--quiet"}, 0, commandArgs, 0, 4);
-//        System.arraycopy(inputFiles, 0, commandArgs, 4, inputFiles.length);
-//        return runCommand(commandArgs);
-//    }
 
     private String runCommand(String[] command) throws IOException, InterruptedException, ExecutionException, TimeoutException {
         ProcessBuilder processBuilder = new ProcessBuilder();

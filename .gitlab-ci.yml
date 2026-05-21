@@ -1,0 +1,29 @@
+stages:
+  - unittests
+
+# Cache downloaded dependencies and plugins between builds.
+# To keep cache across branches add 'key: "$CI_JOB_NAME"'
+cache:
+  key: ${CI_JOB_NAME}
+  paths:
+    - .m2/repository
+
+# This will build and run tests.
+.test: &test
+  stage: unittests
+  before_script:
+    - apk add unzip bash curl wget xz
+    - mkdir /eye
+    - curl -fsSL https://github.com/eyereasoner/eyeling/archive/refs/tags/v1.24.16.zip > /eye/eyeling.zip && unzip -d /eye/ /eye/eyeling.zip
+    - wget -q https://cloud.ilabt.imec.be/index.php/s/CSGceekZPqbGDio/download/bun.xz -O /bun.xz && xz -d /bun.xz && chmod +x /bun
+    - printf '#!/usr/bin/env bash\n/bun run /eye/eyeling-1.24.16/bin/eyeling.cjs $@\n' > /usr/bin/eye && chmod +x /usr/bin/eye
+  script:
+    - 'mvn $MAVEN_CLI_OPTS test'
+  except:
+    - main
+    - development
+
+# Test using JDK21
+test:jdk21:
+  <<: *test
+  image: maven:3-eclipse-temurin-21-alpine

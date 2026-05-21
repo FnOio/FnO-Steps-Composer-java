@@ -1,0 +1,8 @@
+@prefix o-persoon: <https://data.vlaanderen.be/ns/persoon#> .
+@prefix ex: <http://example.com/ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+ex:Bob a o-persoon:Inwoner ;
+  rdfs:comment "I grab my hiking gear. What's next?";
+  ex:hashasHat true ;
+  ex:hashasHikingGear true .

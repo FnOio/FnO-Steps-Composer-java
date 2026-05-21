@@ -1,0 +1,18 @@
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+@prefix time: <http://www.w3.org/2000/10/swap/time#>.
+@prefix math: <http://www.w3.org/2000/10/swap/math#>.
+@prefix : <http://example.com/ns#>.
+
+# Has the traffic light turned green yet?
+{
+    ?clock a :Clock .
+    ?clock :hasTime ?currentTime .
+
+    ?trafficLight a :TrafficLight .
+    ?trafficLight :becomesGreenAt ?itsGreenTime .
+
+    (?currentTime ?itsGreenTime) math:difference ?timeDiff .
+    ?timeDiff math:greaterThan "PT0S"^^xsd:duration .
+} => {
+    ?trafficLight :isGreen true .
+}.

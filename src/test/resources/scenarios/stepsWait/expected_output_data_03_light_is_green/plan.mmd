@@ -1,0 +1,12 @@
+stateDiagram-v2
+
+classDef current font-weight:bold,fill:blue,color:white
+classDef done fill:#0a0,color:white
+classDef deleted fill:#f55,color:white
+
+[*] --> atTrafficLight : goToTrafficLight
+class atTrafficLight done
+atTrafficLight --> lightIsGreen : waitUntilGreen
+class lightIsGreen current
+lightIsGreen --> atDestination : reachDestination
+atDestination --> [*]

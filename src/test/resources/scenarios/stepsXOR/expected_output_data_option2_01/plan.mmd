@@ -1,0 +1,16 @@
+stateDiagram-v2
+
+classDef current font-weight:bold,fill:blue,color:white
+classDef done fill:#0a0,color:white
+classDef deleted fill:#f55,color:white
+
+state choice_0 <<choice>>
+[*] --> choice_0
+choice_0 --> hasMoney : getMoney
+class hasMoney current
+hasMoney --> hasHikingGear : getHikingGear
+hasHikingGear --> reachedB : hike
+reachedB --> [*]
+choice_0 --> hasNoHikingGear : getNoHikingGear
+class hasNoHikingGear deleted
+hasNoHikingGear --> reachedB : goThroughTunnel

@@ -1,0 +1,19 @@
+PREFIX fno-steps: <https://w3id.org/imec/ns/fno-steps#>
+PREFIX : <http://localhost:8000/states#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX shapes: <http://localhost:8000/shapes#>
+
+:hasHat
+    a fno-steps:State ;
+    rdfs:label "You have a hat, because the sun shines" ;
+    fno-steps:hasStateShape shapes:hasHat .
+
+:hasHikingGear
+    a fno-steps:State ;
+    rdfs:label "You have hiking gear and are ready to climb a mountain!" ;
+    fno-steps:hasStateShape shapes:hasHikingGear .
+
+:reachedB
+    a fno-steps:State ;
+    rdfs:label "Got to point B" ;
+    fno-steps:hasStateShape shapes:reachedB .

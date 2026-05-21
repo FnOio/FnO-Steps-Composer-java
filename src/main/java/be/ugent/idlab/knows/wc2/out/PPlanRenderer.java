@@ -40,15 +40,17 @@ public class PPlanRenderer implements PlanRenderer {
 
         // Render each plan as a P-Plan
         Graph planGraph = GraphFactory.createDefaultGraph();
-        State currentState = queryGraph.getCurrentState();
+        State currentState = queryGraph.getStartState();
         int plan_nr = 1;
         for (Set<State> plan : plans) {
             Node thePlan = NodeFactory.createURI(baseIRI + "pplan_" + plan_nr);
-            planGraph.add(thePlan, a, ppClass);
-            int cost = renderPlan(planGraph, plan, plan_nr, thePlan, currentState, null);
             // For now, the cost is just the number of steps involved in the plan
-            planGraph.add(thePlan, hasCost, NodeFactory.createLiteralByValue(cost));
-            plan_nr++;
+            int cost = renderPlan(planGraph, plan, plan_nr, thePlan, currentState, null);
+            if (cost > 0) {
+                planGraph.add(thePlan, a, ppClass);
+                planGraph.add(thePlan, hasCost, NodeFactory.createLiteralByValue(cost));
+                ++plan_nr;
+            }
         }
         StringWriter out = new StringWriter();
         RDFDataMgr.write(out, planGraph, RDFFormat.TURTLE_BLOCKS);
@@ -63,24 +65,28 @@ public class PPlanRenderer implements PlanRenderer {
                             final Node previousStep) {
 
         // the steps starting from this state
-        List<String> steps = currentState.getNextSteps().entrySet().stream()
+         List<Map.Entry<String, State>> stepToStates = currentState.getNextSteps().entrySet().stream()
                 .filter(stepToState -> plan.contains(stepToState.getValue()))
-                .map(Map.Entry::getKey)
                 .toList();
 
-        int cost = steps.size();
+        int cost = 0;
 
-        for (String step : steps) {
+        for (Map.Entry<String, State> stepToState : stepToStates) {
+
+            String step = stepToState.getKey();
             Node fnoStep =  NodeFactory.createURI(step);
             String ppStepIRI =  step.substring(step.lastIndexOf('#') + 1);
             Node stepNode = NodeFactory.createURI(baseIRI + ppStepIRI + '_' + planNr);
-            planGraph.add(stepNode, stepOfPlan, thePlan);
-            planGraph.add(stepNode, usesStep, fnoStep);
-            if (previousStep != null) {
-                planGraph.add(stepNode, isPrecededBy, previousStep);
+            State nextState = stepToState.getValue();
+            if (nextState.getStatus().equals(Status.Todo)) {
+                planGraph.add(stepNode, stepOfPlan, thePlan);
+                planGraph.add(stepNode, usesStep, fnoStep);
+                if (currentState.getStatus().equals(Status.Todo) && previousStep != null) {
+                    planGraph.add(stepNode, isPrecededBy, previousStep);
+                }
+                ++cost;
             }
-            State nextState = currentState.getNextSteps().get(step);
-            // get every the state of this step and recursively repeat
+
             cost += renderPlan(planGraph, plan, planNr, thePlan, nextState, stepNode);
         }
         return cost;
@@ -97,11 +103,16 @@ public class PPlanRenderer implements PlanRenderer {
     private static List<Set<State>> splitPlan(final QueryGraph queryGraph) {
         List<Set<State>> plans = new ArrayList<>(1);
         plans.add(new HashSet<>());
-        splitPlan(queryGraph, queryGraph.getCurrentState(), plans);
+        splitPlan(queryGraph.getStartState(), plans);
         return plans;
     }
 
-    private static void splitPlan(final QueryGraph queryGraph, final State currentState, final List<Set<State>> plans) {
+    private static void splitPlan(final State currentState, final List<Set<State>> plans) {
+        // Don't include deleted states
+        if (currentState.getStatus().equals(Status.Deleted)) {
+            return;
+        }
+
         // add current state to latest plan
         Set<State> currentPlan = plans.getLast();
         currentPlan.add(currentState);
@@ -112,20 +123,20 @@ public class PPlanRenderer implements PlanRenderer {
 
             // The first state of the next states can be added to the current plan
             State firstNextState = nextStateIter.next();
-            splitPlan(queryGraph, firstNextState, plans);
+            splitPlan(firstNextState, plans);
 
             // The rest needs new plans
             nextStateIter.forEachRemaining(nextState -> {
                 Set<State> newPlan = new HashSet<>();
                 addPreviousStatesToPlan(nextState, newPlan);
                 plans.add(newPlan);
-                splitPlan(queryGraph, nextState, plans);
+                splitPlan(nextState, plans);
             });
 
         } else {
             // Just add every next state to the current plan
             for (State nextState : currentState.getNextSteps().values()) {
-                splitPlan(queryGraph, nextState, plans);
+                splitPlan(nextState, plans);
             }
         }
     }

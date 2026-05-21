@@ -1,0 +1,58 @@
+PREFIX fno-steps: <https://w3id.org/imec/ns/fno-steps#>
+PREFIX states: <http://localhost:8000/states#>
+PREFIX skos: <http://www.w3.org/2008/05/skos-xl#>
+PREFIX : <http://localhost:8000/steps#>
+
+:fromAtoB
+    a fno-steps:ContainerLevelStep, fno-steps:JourneyLevelStep ;
+    fno-steps:hasDescription :fromAtoBDescription ;
+    fno-steps:producesState states:reachedB ;
+    fno-steps:requiresState fno-steps:emptyState .
+
+:fromAtoBDescription
+    skos:literalForm "Go from A to B, but there's a mountain in between..." .
+
+:getHikingGear
+    a fno-steps:ComponentLevelStep ;
+    fno-steps:hasDescription :getHikingGearDescription ;
+    fno-steps:producesState states:hasHikingGear ;
+    fno-steps:requiresState states:hasMoney .
+
+:getHikingGearDescription
+    skos:literalForm "Buy hiking gear" .
+
+:getMoney
+    a fno-steps:ComponentLevelStep ;
+    fno-steps:hasDescription :getMoneyDescription ;
+    fno-steps:producesState states:hasMoney ;
+    fno-steps:requiresState fno-steps:emptyState .
+
+:getMoneyDescription
+    skos:literalForm "Get money and buy hiking gear" .
+
+:getNoHikingGear
+    a fno-steps:ComponentLevelStep ;
+    fno-steps:hasDescription :getNoHikingGearDescription ;
+    fno-steps:producesState states:hasNoHikingGear ;
+    fno-steps:requiresState fno-steps:emptyState .
+
+:getNoHikingGearDescription
+    skos:literalForm "There is no hiking gear" .
+
+:goThroughTunnel
+    a fno-steps:ComponentLevelStep ;
+    fno-steps:hasDescription :goThroughTunnelDescription ;
+    fno-steps:producesState states:reachedB ;
+    fno-steps:requiresState states:hasNoHikingGear .
+
+:goThroughTunnelDescription
+    skos:literalForm "You don't have hiking gear; go through the tunnel" .
+
+:hike
+    a fno-steps:ComponentLevelStep ;
+    fno-steps:hasDescription :hikeDescription ;
+    fno-steps:producesState states:reachedB ;
+    fno-steps:requiresState states:hasHikingGear .
+
+:hikeDescription
+    skos:literalForm "Hike over the mountain, only if you have hiking gear" .

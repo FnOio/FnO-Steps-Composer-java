@@ -1,0 +1,14 @@
+@prefix o-persoon: <https://data.vlaanderen.be/ns/persoon#> .
+@prefix : <http://example.com/ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+:Alice a o-persoon:Inwoner ;
+    rdfs:comment "I reached the traffic light, but it's red. I have to wait until it's green." ;
+    :atTrafficLight true .
+
+:TL01 a :TrafficLight ;
+    :becomesGreenAt "2100-04-20T09:00:00"^^xsd:dateTime .
+
+:Clock1 a :Clock ;
+    :hasTime "2100-04-20T08:59:40"^^xsd:dateTime .

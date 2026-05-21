@@ -73,7 +73,7 @@ The workflow composer typically runs a *scenario*.
 A scenario consists of a set of *states*, *shapes* and *states*, a set of *data* files and a set of *goal states*.
 Make sure all files are UTF-8 encoded.
 
-Here is how a typical scenario directory looks like ([example](https://github.com/FnOio/FnO-Steps-Composer/tree/main/scenarios/stepsWait)):
+Here is how a typical scenario directory looks like ([example](src/test/resources/scenarios/stepsWait)):
 ```
 stepsWait/
 ├── data_01.ttl

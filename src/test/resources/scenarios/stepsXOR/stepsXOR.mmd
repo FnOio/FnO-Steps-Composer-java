@@ -1,0 +1,13 @@
+---
+title: choose either to hike or take the tunnel
+---
+stateDiagram-v2
+    state choose <<choice>>
+
+    [*] --> choose
+    choose --> hasMoney : get_money | Get money and buy hiking gear
+    hasMoney --> hasHikingGear: get_hiking_gear | Buy hiking gear
+    hasHikingGear --> reachedB: hike | Hike over the mountain, only if you have hiking gear
+    choose --> hasNoHikingGear : dont_get_hiking_gear | There is no hiking gear
+    hasNoHikingGear --> reachedB : go_through_tunnel | You don't have hiking gear - go through the tunnel
+    reachedB --> [*]

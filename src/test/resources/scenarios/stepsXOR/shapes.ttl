@@ -1,0 +1,67 @@
+PREFIX : <http://localhost:8000/shapes#>
+PREFIX fno-steps: <https://w3id.org/imec/ns/fno-steps#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX sh: <http://www.w3.org/ns/shacl#>
+PREFIX persoon: <https://data.vlaanderen.be/ns/persoon#>
+PREFIX xmls: <http://www.w3.org/2001/XMLSchema#>
+PREFIX ex: <http://example.com/ns#>
+
+:hasHikingGear
+    a fno-steps:StateShape ;
+    rdfs:label "TODO: provide a description" ;
+    sh:property :hasHikingGearPropertyShape ;
+    sh:targetClass persoon:Inwoner .
+
+:hasHikingGearPropertyShape
+    a sh:PropertyShape ;
+    rdfs:label "TODO: provide a description" ;
+    sh:datatype xmls:boolean ;
+    sh:maxCount 1 ;
+    sh:minCount 1 ;
+    sh:path ex:hashasHikingGear ;
+    sh:pattern "true" .
+
+:hasMoney
+    a fno-steps:StateShape ;
+    rdfs:label "TODO: provide a description" ;
+    sh:property :hasMoneyPropertyShape ;
+    sh:targetClass persoon:Inwoner .
+
+:hasMoneyPropertyShape
+    a sh:PropertyShape ;
+    rdfs:label "TODO: provide a description" ;
+    sh:datatype xmls:boolean ;
+    sh:maxCount 1 ;
+    sh:minCount 1 ;
+    sh:path ex:hashasMoney ;
+    sh:pattern "true" .
+
+:hasNoHikingGear
+    a fno-steps:StateShape ;
+    rdfs:label "TODO: provide a description" ;
+    sh:property :hasNoHikingGearPropertyShape ;
+    sh:targetClass persoon:Inwoner .
+
+:hasNoHikingGearPropertyShape
+    a sh:PropertyShape ;
+    rdfs:label "TODO: provide a description" ;
+    sh:datatype xmls:boolean ;
+    sh:maxCount 1 ;
+    sh:minCount 1 ;
+    sh:path ex:hashasNoHikingGear ;
+    sh:pattern "true" .
+
+:reachedB
+    a fno-steps:StateShape ;
+    rdfs:label "TODO: provide a description" ;
+    sh:property :reachedBPropertyShape ;
+    sh:targetClass persoon:Inwoner .
+
+:reachedBPropertyShape
+    a sh:PropertyShape ;
+    rdfs:label "TODO: provide a description" ;
+    sh:datatype xmls:boolean ;
+    sh:maxCount 1 ;
+    sh:minCount 1 ;
+    sh:path ex:hasreachedB ;
+    sh:pattern "true" .

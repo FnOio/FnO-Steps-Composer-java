@@ -1,0 +1,12 @@
+State: emptyState ☑
+OR
+Step:  getMoney ☑
+  State: hasMoney ☑
+  Step:  getHikingGear ☑
+  State: hasHikingGear ◉
+  Step:  hike ☐
+  State: reachedB
+Step:  getNoHikingGear ☒
+  State: hasNoHikingGear ☒
+  Step:  goThroughTunnel ☒
+  State: reachedB

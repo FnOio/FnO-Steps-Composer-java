@@ -1,0 +1,53 @@
+PREFIX fno-steps: <https://w3id.org/imec/ns/fno-steps#>
+PREFIX states: <http://localhost:8000/states#>
+PREFIX skos: <http://www.w3.org/2008/05/skos-xl#>
+PREFIX : <http://localhost:8000/steps#>
+
+# This step is ignored because it's a JourneyLevelStep.
+# Left here for compatibility with the previous implementation.
+:fromAtoB
+    a fno-steps:JourneyLevelStep ;
+    fno-steps:hasDescription :fromAtoBDescription ;
+    fno-steps:producesState states:reachedB ;
+    fno-steps:requiresState fno-steps:emptyState .
+
+:fromAtoBDescription
+    skos:literalForm "Go from A to B, but there's a mountain in between..." .
+
+:getHat
+    a fno-steps:ComponentLevelStep ;
+    fno-steps:hasDescription :getHatDescription ;
+    fno-steps:producesState states:hasHat ;
+    fno-steps:requiresState fno-steps:emptyState .
+
+:getHatDescription
+    skos:literalForm "You get a hat because the sun shines" .
+
+:getHikingGear
+    a fno-steps:ComponentLevelStep ;
+    fno-steps:hasDescription :getHikingGearDescription ;
+    fno-steps:producesState states:hasHikingGear ;
+    fno-steps:requiresState fno-steps:emptyState .
+
+:getHikingGearDescription
+    skos:literalForm "You grab your hiking gear" .
+
+:hike
+    a fno-steps:ComponentLevelStep ;
+    fno-steps:hasDescription :hikeDescription ;
+    fno-steps:producesState states:reachedB ;
+    fno-steps:requiresState states:hasHat, states:hasHikingGear .
+
+:hikeDescription
+    skos:literalForm "You're reaching B" .
+
+# This step is ignored because it's a ContainerLevelStep.
+# Left here for compatibility with the previous implementation.
+:hikeToB
+    a fno-steps:ContainerLevelStep ;
+    fno-steps:hasDescription :hikeToBDescription ;
+    fno-steps:producesState states:reachedB ;
+    fno-steps:requiresState fno-steps:emptyState .
+
+:hikeToBDescription
+    skos:literalForm "Hike over the mountain, only if you have hiking gear" .
