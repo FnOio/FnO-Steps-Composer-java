@@ -1,0 +1,19 @@
+PREFIX : <http://example.com/ns#>
+PREFIX schema: <https://schema.org/>
+
+:me a schema:Thing ;
+    :haveFlour true ;
+    :haveButter true ;
+    :haveEggs true ;
+    :haveIngredients true ;
+    :haveIngredientsCake true ;
+    :readyForBaking true ;
+    :batterReady true ;
+    :baking true .
+
+# The timer has gone off.
+:timer a :Timer ;
+    :timerDuration 0 .@prefix : <http://example.com/ns#> .
+
+:timer :isFinished true .
+:me :cakeReady true .

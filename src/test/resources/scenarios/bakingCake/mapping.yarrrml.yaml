@@ -1,0 +1,117 @@
+
+prefixes:
+  ex: "http://example.com/ns#"
+  fno-steps: "https://w3id.org/imec/ns/fno-steps#"
+  sh: "http://www.w3.org/ns/shacl#"
+  schema: "https://schema.org/"
+  rdfs: "http://www.w3.org/2000/01/rdf-schema#"
+  xl: "http://www.w3.org/2008/05/skos-xl#"
+  xsd: "http://www.w3.org/2001/XMLSchema#"
+  grel: "http://users.ugent.be/~bjdmeest/function/grel.ttl#"
+  idlab-fn: "https://w3id.org/imec/idlab/function#"
+
+sources:
+  shapes-source: ['/mnt/data//out/shapes.csv~csv']
+  states-source: ['/mnt/data//out/states.csv~csv']
+  steps-source:
+    access: '/mnt/data//out/steps.json'
+    referenceFormulation: jsonpath
+    iterator: $[*]
+
+targets:
+  shapes-target: ['/mnt/data//out/shapes.ttl~void', turtle]
+  states-target: ['/mnt/data//out/states.ttl~void', turtle]
+  steps-target: ['/mnt/data//out/steps.ttl~void', turtle]
+
+
+mappings:
+
+  ###########################
+  # mapping of state shapes #
+  ###########################
+  shape:
+    sources: shapes-source
+    subjects:
+      - value: http://localhost:8000/shapes#$(name)
+        targets: shapes-target
+    po:
+      - [a, fno-steps:StateShape]
+      - [rdfs:label, 'TODO: provide a description']
+      - [sh:targetClass, schema:Thing~iri]
+      - predicate: sh:property
+        object:
+          - mapping: propertyShape
+
+  # The property shapes are the actual shapes. This generates no actual content:
+  # it is up to the user to define the SHACL shapes
+  propertyShape:
+    sources: shapes-source
+    subjects:
+      - value: http://localhost:8000/shapes#$(name)PropertyShape
+        targets: shapes-target
+    po:
+      - [a, sh:PropertyShape ]
+      - [rdfs:label, 'TODO: provide a description']
+      - [sh:path, ex:$(name)~iri]
+      - [sh:datatype, xsd:boolean~iri]
+      - [sh:minCount, '1', xsd:integer]
+      - [sh:maxCount, '1', xsd:integer]
+      - [sh:pattern, 'true']
+
+
+  #####################
+  # mapping of states #
+  #####################
+  states:
+    sources: states-source
+    subjects:
+      - value: http://localhost:8000/states#$(name)
+        targets: states-target
+    po:
+      - [a, fno-steps:State ]
+      - [rdfs:label, $(description)]
+      - predicate: fno-steps:hasStateShape
+        object:
+          - mapping: shape
+            condition:
+              function: equal
+              parameters:
+                - [str1, $(name), o]
+                - [str2, $(shape), s]
+
+  ####################
+  # mapping of steps #
+  ####################
+  steps:
+    sources: steps-source
+    subjects:
+      - value: http://localhost:8000/steps#$(name)
+        targets: steps-target
+    po:
+      - [a, https://w3id.org/imec/ns/fno-steps#$(levels)LevelStep ]
+      - predicate: fno-steps:hasDescription
+        objects:
+          - mapping: stepsDescriptions
+      - [fno-steps:requiresState, http://localhost:8000/states#$(start_states)~iri]
+      - predicate: fno-steps:requiresState
+        objects:
+          - value: fno-steps:emptyState
+            type: iri
+        condition:
+          function: equal
+          parameters:
+            - [grel:valueParameter, 0]
+            - parameter: grel:valueParameter2
+              value:
+                function: grel:array_length
+                parameters:
+                  - [grel:p_array_a, $(start_states)]
+      - [fno-steps:producesState, http://localhost:8000/states#$(end_states)~iri]
+
+  stepsDescriptions:
+    sources: steps-source
+    subjects:
+      - value: http://localhost:8000/steps#$(name)Description
+        targets: steps-target
+    po:
+      - [xl:literalForm, $(description)]

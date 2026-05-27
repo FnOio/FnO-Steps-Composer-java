@@ -18,7 +18,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
-import static be.ugent.idlab.knows.wc2.graph.Operator.*;
+import static be.ugent.idlab.knows.wc2.graph.Operator.AND;
+import static be.ugent.idlab.knows.wc2.graph.Operator.XOR;
 
 
 public class QueryGraphBuilder {

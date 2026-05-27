@@ -1,0 +1,77 @@
+<http://localhost:8000/pplan#pplan_2>
+        <https://w3id.org/imec/ns/fno-steps#cost>  "19"^^<http://www.w3.org/2001/XMLSchema#int>;
+        a       <http://purl.org/net/p-plan#Plan> .
+
+<http://localhost:8000/pplan#buy_eggs_2>
+        <https://w3id.org/imec/ns/fno-steps#isPrecededBy>  <http://localhost:8000/pplan#ingredients_missing_2>;
+        <https://w3id.org/imec/ns/fno-steps#usesStep>  <http://localhost:8000/steps#buy_eggs>;
+        <http://purl.org/net/p-plan#isStepOfPlan>  <http://localhost:8000/pplan#pplan_2> .
+
+<http://localhost:8000/pplan#buy_butter_2>
+        <https://w3id.org/imec/ns/fno-steps#isPrecededBy>  <http://localhost:8000/pplan#ingredients_missing_2>;
+        <https://w3id.org/imec/ns/fno-steps#usesStep>  <http://localhost:8000/steps#buy_butter>;
+        <http://purl.org/net/p-plan#isStepOfPlan>  <http://localhost:8000/pplan#pplan_2> .
+
+<http://localhost:8000/pplan#wait_for_1_hour_2>
+        <https://w3id.org/imec/ns/fno-steps#isPrecededBy>  <http://localhost:8000/pplan#put_in_oven_2>;
+        <https://w3id.org/imec/ns/fno-steps#usesStep>  <http://localhost:8000/steps#wait_for_1_hour>;
+        <http://purl.org/net/p-plan#isStepOfPlan>  <http://localhost:8000/pplan#pplan_2> .
+
+<http://localhost:8000/pplan#put_in_oven_2>
+        <https://w3id.org/imec/ns/fno-steps#isPrecededBy>  <http://localhost:8000/pplan#follow_recipe_2>;
+        <https://w3id.org/imec/ns/fno-steps#usesStep>  <http://localhost:8000/steps#put_in_oven>;
+        <http://purl.org/net/p-plan#isStepOfPlan>  <http://localhost:8000/pplan#pplan_2> .
+
+<http://localhost:8000/pplan#follow_recipe_2>
+        <https://w3id.org/imec/ns/fno-steps#isPrecededBy>  <http://localhost:8000/pplan#go_home_2>;
+        <https://w3id.org/imec/ns/fno-steps#usesStep>  <http://localhost:8000/steps#follow_recipe>;
+        <http://purl.org/net/p-plan#isStepOfPlan>  <http://localhost:8000/pplan#pplan_2> .
+
+<http://localhost:8000/pplan#go_home_2>
+        <https://w3id.org/imec/ns/fno-steps#isPrecededBy>  <http://localhost:8000/pplan#have_ingredients_2>;
+        <https://w3id.org/imec/ns/fno-steps#usesStep>  <http://localhost:8000/steps#go_home>;
+        <http://purl.org/net/p-plan#isStepOfPlan>  <http://localhost:8000/pplan#pplan_2> .
+
+<http://localhost:8000/pplan#have_ingredients_2>
+        <https://w3id.org/imec/ns/fno-steps#isPrecededBy>  <http://localhost:8000/pplan#buy_eggs_2>;
+        <https://w3id.org/imec/ns/fno-steps#isPrecededBy>  <http://localhost:8000/pplan#buy_butter_2>;
+        <https://w3id.org/imec/ns/fno-steps#isPrecededBy>  <http://localhost:8000/pplan#buy_flour_2>;
+        <https://w3id.org/imec/ns/fno-steps#usesStep>  <http://localhost:8000/steps#have_ingredients>;
+        <http://purl.org/net/p-plan#isStepOfPlan>  <http://localhost:8000/pplan#pplan_2> .
+
+<http://localhost:8000/pplan#buy_flour_2>
+        <https://w3id.org/imec/ns/fno-steps#isPrecededBy>  <http://localhost:8000/pplan#ingredients_missing_2>;
+        <https://w3id.org/imec/ns/fno-steps#usesStep>  <http://localhost:8000/steps#buy_flour>;
+        <http://purl.org/net/p-plan#isStepOfPlan>  <http://localhost:8000/pplan#pplan_2> .
+
+<http://localhost:8000/pplan#ingredients_missing_2>
+        <https://w3id.org/imec/ns/fno-steps#usesStep>  <http://localhost:8000/steps#ingredients_missing>;
+        <http://purl.org/net/p-plan#isStepOfPlan>  <http://localhost:8000/pplan#pplan_2> .
+
+<http://localhost:8000/pplan#pplan_1>
+        <https://w3id.org/imec/ns/fno-steps#cost>  "5"^^<http://www.w3.org/2001/XMLSchema#int>;
+        a       <http://purl.org/net/p-plan#Plan> .
+
+<http://localhost:8000/pplan#wait_for_1_hour_1>
+        <https://w3id.org/imec/ns/fno-steps#isPrecededBy>  <http://localhost:8000/pplan#put_in_oven_1>;
+        <https://w3id.org/imec/ns/fno-steps#usesStep>  <http://localhost:8000/steps#wait_for_1_hour>;
+        <http://purl.org/net/p-plan#isStepOfPlan>  <http://localhost:8000/pplan#pplan_1> .
+
+<http://localhost:8000/pplan#put_in_oven_1>
+        <https://w3id.org/imec/ns/fno-steps#isPrecededBy>  <http://localhost:8000/pplan#follow_recipe_1>;
+        <https://w3id.org/imec/ns/fno-steps#usesStep>  <http://localhost:8000/steps#put_in_oven>;
+        <http://purl.org/net/p-plan#isStepOfPlan>  <http://localhost:8000/pplan#pplan_1> .
+
+<http://localhost:8000/pplan#follow_recipe_1>
+        <https://w3id.org/imec/ns/fno-steps#isPrecededBy>  <http://localhost:8000/pplan#start_1>;
+        <https://w3id.org/imec/ns/fno-steps#usesStep>  <http://localhost:8000/steps#follow_recipe>;
+        <http://purl.org/net/p-plan#isStepOfPlan>  <http://localhost:8000/pplan#pplan_1> .
+
+<http://localhost:8000/pplan#start_1>
+        <https://w3id.org/imec/ns/fno-steps#isPrecededBy>  <http://localhost:8000/pplan#ok_1>;
+        <https://w3id.org/imec/ns/fno-steps#usesStep>  <http://localhost:8000/steps#start>;
+        <http://purl.org/net/p-plan#isStepOfPlan>  <http://localhost:8000/pplan#pplan_1> .
+
+<http://localhost:8000/pplan#ok_1>
+        <https://w3id.org/imec/ns/fno-steps#usesStep>  <http://localhost:8000/steps#ok>;
+        <http://purl.org/net/p-plan#isStepOfPlan>  <http://localhost:8000/pplan#pplan_1> .

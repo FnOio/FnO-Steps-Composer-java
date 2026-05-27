@@ -1,0 +1,7 @@
+PREFIX : <http://example.com/ns#>
+PREFIX schema: <https://schema.org/>
+
+:me a schema:Thing ;
+    :ingredientsMissing true ;
+    :haveFlour true ;
+    :haveButter true .

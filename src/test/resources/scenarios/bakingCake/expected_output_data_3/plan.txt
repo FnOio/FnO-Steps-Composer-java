@@ -1,0 +1,51 @@
+State: emptyState ☑
+OR
+Step:  ok ☒
+  State: noIngredientsMissing ☒
+  Step:  start ☒
+  State: readyForBaking
+  Step:  follow_recipe ☐
+  State: batterReady
+  Step:  put_in_oven ☐
+  State: baking
+  Step:  wait_for_1_hour ☐
+  State: cakeReady
+Step:  ingredients_missing ☑
+  State: ingredientsMissing ☑
+  AND
+  Step:  buy_flour ☑
+    State: haveFlour ◉
+    Step:  have_ingredients ☐
+    State: haveIngredients
+    Step:  go_home ☐
+    State: readyForBaking
+    Step:  follow_recipe ☐
+    State: batterReady
+    Step:  put_in_oven ☐
+    State: baking
+    Step:  wait_for_1_hour ☐
+    State: cakeReady
+  Step:  buy_butter ☑
+    State: haveButter ◉
+    Step:  have_ingredients ☐
+    State: haveIngredients
+    Step:  go_home ☐
+    State: readyForBaking
+    Step:  follow_recipe ☐
+    State: batterReady
+    Step:  put_in_oven ☐
+    State: baking
+    Step:  wait_for_1_hour ☐
+    State: cakeReady
+  Step:  buy_eggs ☐
+    State: haveEggs
+    Step:  have_ingredients ☐
+    State: haveIngredients
+    Step:  go_home ☐
+    State: readyForBaking
+    Step:  follow_recipe ☐
+    State: batterReady
+    Step:  put_in_oven ☐
+    State: baking
+    Step:  wait_for_1_hour ☐
+    State: cakeReady

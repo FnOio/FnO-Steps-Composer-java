@@ -1,0 +1,30 @@
+stateDiagram-v2
+
+classDef current font-weight:bold,fill:blue,color:white
+classDef done fill:#0a0,color:white
+classDef deleted fill:#f55,color:white
+
+state choice_0 <<choice>>
+[*] --> choice_0
+choice_0 --> noIngredientsMissing : ok
+class noIngredientsMissing deleted
+noIngredientsMissing --> readyForBaking : start
+readyForBaking --> batterReady : follow_recipe
+batterReady --> baking : put_in_oven
+baking --> cakeReady : wait_for_1_hour
+cakeReady --> [*]
+choice_0 --> ingredientsMissing : ingredients_missing
+class ingredientsMissing current
+state fork_1 <<fork>>
+ingredientsMissing --> fork_1
+fork_1 --> haveFlour : buy_flour
+state join_2 <<join>>
+haveFlour --> join_2
+join_2 --> haveIngredients : have_ingredients
+haveIngredients --> readyForBaking : go_home
+fork_1 --> haveButter : buy_butter
+state join_2 <<join>>
+haveButter --> join_2
+fork_1 --> haveEggs : buy_eggs
+state join_2 <<join>>
+haveEggs --> join_2

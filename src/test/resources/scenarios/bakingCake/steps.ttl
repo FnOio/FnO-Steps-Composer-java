@@ -1,0 +1,113 @@
+
+<http://localhost:8000/steps#buy_butter> a <https://w3id.org/imec/ns/fno-steps#ComponentLevelStep>;
+  <https://w3id.org/imec/ns/fno-steps#hasDescription> <http://localhost:8000/steps#buy_butterDescription>;
+  <https://w3id.org/imec/ns/fno-steps#producesState> <http://localhost:8000/states#haveButter>;
+  <https://w3id.org/imec/ns/fno-steps#requiresState> <http://localhost:8000/states#ingredientsMissing> .
+
+<http://localhost:8000/steps#buy_butterDescription> <http://www.w3.org/2008/05/skos-xl#literalForm>
+    "Buy butter" .
+
+<http://localhost:8000/steps#buy_eggs> a <https://w3id.org/imec/ns/fno-steps#ComponentLevelStep>;
+  <https://w3id.org/imec/ns/fno-steps#hasDescription> <http://localhost:8000/steps#buy_eggsDescription>;
+  <https://w3id.org/imec/ns/fno-steps#producesState> <http://localhost:8000/states#haveEggs>;
+  <https://w3id.org/imec/ns/fno-steps#requiresState> <http://localhost:8000/states#ingredientsMissing> .
+
+<http://localhost:8000/steps#buy_eggsDescription> <http://www.w3.org/2008/05/skos-xl#literalForm>
+    "Buy eggs" .
+
+<http://localhost:8000/steps#buy_flour> a <https://w3id.org/imec/ns/fno-steps#ComponentLevelStep>;
+  <https://w3id.org/imec/ns/fno-steps#hasDescription> <http://localhost:8000/steps#buy_flourDescription>;
+  <https://w3id.org/imec/ns/fno-steps#producesState> <http://localhost:8000/states#haveFlour>;
+  <https://w3id.org/imec/ns/fno-steps#requiresState> <http://localhost:8000/states#ingredientsMissing> .
+
+<http://localhost:8000/steps#buy_flourDescription> <http://www.w3.org/2008/05/skos-xl#literalForm>
+    "Buy flour" .
+
+<http://localhost:8000/steps#container_journey_step_%5BSTART_STATE%5D-%5BingredientsMissing%5D>
+  a <https://w3id.org/imec/ns/fno-steps#ContainerLevelStep>, <https://w3id.org/imec/ns/fno-steps#JourneyLevelStep>;
+  <https://w3id.org/imec/ns/fno-steps#hasDescription> <http://localhost:8000/steps#container_journey_step_%5BSTART_STATE%5D-%5BingredientsMissing%5DDescription>;
+  <https://w3id.org/imec/ns/fno-steps#producesState> <http://localhost:8000/states#ingredientsMissing>;
+  <https://w3id.org/imec/ns/fno-steps#requiresState> <https://w3id.org/imec/ns/fno-steps#emptyState> .
+
+<http://localhost:8000/steps#container_journey_step_%5BSTART_STATE%5D-%5BreadyForBaking%5D>
+  a <https://w3id.org/imec/ns/fno-steps#ContainerLevelStep>, <https://w3id.org/imec/ns/fno-steps#JourneyLevelStep>;
+  <https://w3id.org/imec/ns/fno-steps#hasDescription> <http://localhost:8000/steps#container_journey_step_%5BSTART_STATE%5D-%5BreadyForBaking%5DDescription>;
+  <https://w3id.org/imec/ns/fno-steps#producesState> <http://localhost:8000/states#readyForBaking>;
+  <https://w3id.org/imec/ns/fno-steps#requiresState> <https://w3id.org/imec/ns/fno-steps#emptyState> .
+
+<http://localhost:8000/steps#container_journey_step_%5BhaveIngredients%5D-%5BcakeReady%5D>
+  a <https://w3id.org/imec/ns/fno-steps#ContainerLevelStep>, <https://w3id.org/imec/ns/fno-steps#JourneyLevelStep>;
+  <https://w3id.org/imec/ns/fno-steps#hasDescription> <http://localhost:8000/steps#container_journey_step_%5BhaveIngredients%5D-%5BcakeReady%5DDescription>;
+  <https://w3id.org/imec/ns/fno-steps#producesState> <http://localhost:8000/states#cakeReady>;
+  <https://w3id.org/imec/ns/fno-steps#requiresState> <http://localhost:8000/states#haveIngredients> .
+
+<http://localhost:8000/steps#container_journey_step_%5BingredientsMissing%5D-%5BhaveIngredients%5D>
+  a <https://w3id.org/imec/ns/fno-steps#ContainerLevelStep>, <https://w3id.org/imec/ns/fno-steps#JourneyLevelStep>;
+  <https://w3id.org/imec/ns/fno-steps#hasDescription> <http://localhost:8000/steps#container_journey_step_%5BingredientsMissing%5D-%5BhaveIngredients%5DDescription>;
+  <https://w3id.org/imec/ns/fno-steps#producesState> <http://localhost:8000/states#haveIngredients>;
+  <https://w3id.org/imec/ns/fno-steps#requiresState> <http://localhost:8000/states#ingredientsMissing> .
+
+<http://localhost:8000/steps#follow_recipe> a <https://w3id.org/imec/ns/fno-steps#ComponentLevelStep>;
+  <https://w3id.org/imec/ns/fno-steps#hasDescription> <http://localhost:8000/steps#follow_recipeDescription>;
+  <https://w3id.org/imec/ns/fno-steps#producesState> <http://localhost:8000/states#batterReady>;
+  <https://w3id.org/imec/ns/fno-steps#requiresState> <http://localhost:8000/states#readyForBaking> .
+
+<http://localhost:8000/steps#follow_recipeDescription> <http://www.w3.org/2008/05/skos-xl#literalForm>
+    "Follow the recipe" .
+
+<http://localhost:8000/steps#go_home> a <https://w3id.org/imec/ns/fno-steps#ComponentLevelStep>;
+  <https://w3id.org/imec/ns/fno-steps#hasDescription> <http://localhost:8000/steps#go_homeDescription>;
+  <https://w3id.org/imec/ns/fno-steps#producesState> <http://localhost:8000/states#readyForBaking>;
+  <https://w3id.org/imec/ns/fno-steps#requiresState> <http://localhost:8000/states#haveIngredients> .
+
+<http://localhost:8000/steps#go_homeDescription> <http://www.w3.org/2008/05/skos-xl#literalForm>
+    "Go home and get ready to bake" .
+
+<http://localhost:8000/steps#have_ingredients> a <https://w3id.org/imec/ns/fno-steps#ComponentLevelStep>;
+  <https://w3id.org/imec/ns/fno-steps#hasDescription> <http://localhost:8000/steps#have_ingredientsDescription>;
+  <https://w3id.org/imec/ns/fno-steps#producesState> <http://localhost:8000/states#haveIngredients>;
+  <https://w3id.org/imec/ns/fno-steps#requiresState> <http://localhost:8000/states#haveButter>,
+    <http://localhost:8000/states#haveEggs>, <http://localhost:8000/states#haveFlour> .
+
+<http://localhost:8000/steps#have_ingredientsDescription> <http://www.w3.org/2008/05/skos-xl#literalForm>
+    "Now we have all ingredients" .
+
+<http://localhost:8000/steps#ingredients_missing> a <https://w3id.org/imec/ns/fno-steps#ComponentLevelStep>;
+  <https://w3id.org/imec/ns/fno-steps#hasDescription> <http://localhost:8000/steps#ingredients_missingDescription>;
+  <https://w3id.org/imec/ns/fno-steps#producesState> <http://localhost:8000/states#ingredientsMissing>;
+  <https://w3id.org/imec/ns/fno-steps#requiresState> <https://w3id.org/imec/ns/fno-steps#emptyState> .
+
+<http://localhost:8000/steps#ingredients_missingDescription> <http://www.w3.org/2008/05/skos-xl#literalForm>
+    "We have no ingredients" .
+
+<http://localhost:8000/steps#ok> a <https://w3id.org/imec/ns/fno-steps#ComponentLevelStep>;
+  <https://w3id.org/imec/ns/fno-steps#hasDescription> <http://localhost:8000/steps#okDescription>;
+  <https://w3id.org/imec/ns/fno-steps#producesState> <http://localhost:8000/states#noIngredientsMissing>;
+  <https://w3id.org/imec/ns/fno-steps#requiresState> <https://w3id.org/imec/ns/fno-steps#emptyState> .
+
+<http://localhost:8000/steps#okDescription> <http://www.w3.org/2008/05/skos-xl#literalForm>
+    "All ingredients are there" .
+
+<http://localhost:8000/steps#put_in_oven> a <https://w3id.org/imec/ns/fno-steps#ComponentLevelStep>;
+  <https://w3id.org/imec/ns/fno-steps#hasDescription> <http://localhost:8000/steps#put_in_ovenDescription>;
+  <https://w3id.org/imec/ns/fno-steps#producesState> <http://localhost:8000/states#baking>;
+  <https://w3id.org/imec/ns/fno-steps#requiresState> <http://localhost:8000/states#batterReady> .
+
+<http://localhost:8000/steps#put_in_ovenDescription> <http://www.w3.org/2008/05/skos-xl#literalForm>
+    "Put in the oven" .
+
+<http://localhost:8000/steps#start> a <https://w3id.org/imec/ns/fno-steps#ComponentLevelStep>;
+  <https://w3id.org/imec/ns/fno-steps#hasDescription> <http://localhost:8000/steps#startDescription>;
+  <https://w3id.org/imec/ns/fno-steps#producesState> <http://localhost:8000/states#readyForBaking>;
+  <https://w3id.org/imec/ns/fno-steps#requiresState> <http://localhost:8000/states#noIngredientsMissing> .
+
+<http://localhost:8000/steps#startDescription> <http://www.w3.org/2008/05/skos-xl#literalForm>
+    "Start baking" .
+
+<http://localhost:8000/steps#wait_for_1_hour> a <https://w3id.org/imec/ns/fno-steps#ComponentLevelStep>;
+  <https://w3id.org/imec/ns/fno-steps#hasDescription> <http://localhost:8000/steps#wait_for_1_hourDescription>;
+  <https://w3id.org/imec/ns/fno-steps#producesState> <http://localhost:8000/states#cakeReady>;
+  <https://w3id.org/imec/ns/fno-steps#requiresState> <http://localhost:8000/states#baking> .
+
+<http://localhost:8000/steps#wait_for_1_hourDescription> <http://www.w3.org/2008/05/skos-xl#literalForm>
+    "Wait for one hour" .

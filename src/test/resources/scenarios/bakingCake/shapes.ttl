@@ -1,0 +1,130 @@
+
+<http://localhost:8000/shapes#baking> a <https://w3id.org/imec/ns/fno-steps#StateShape>;
+  <http://www.w3.org/2000/01/rdf-schema#label> "TODO: provide a description";
+  <http://www.w3.org/ns/shacl#property> <http://localhost:8000/shapes#bakingPropertyShape>;
+  <http://www.w3.org/ns/shacl#targetClass> <https://schema.org/Thing> .
+
+<http://localhost:8000/shapes#bakingPropertyShape> a <http://www.w3.org/ns/shacl#PropertyShape>;
+  <http://www.w3.org/2000/01/rdf-schema#label> "TODO: provide a description";
+  <http://www.w3.org/ns/shacl#datatype> <http://www.w3.org/2001/XMLSchema#boolean>;
+  <http://www.w3.org/ns/shacl#maxCount> 1;
+  <http://www.w3.org/ns/shacl#minCount> 1;
+  <http://www.w3.org/ns/shacl#path> <http://example.com/ns#baking>;
+  <http://www.w3.org/ns/shacl#pattern> "true" .
+
+<http://localhost:8000/shapes#batterReady> a <https://w3id.org/imec/ns/fno-steps#StateShape>;
+  <http://www.w3.org/2000/01/rdf-schema#label> "TODO: provide a description";
+  <http://www.w3.org/ns/shacl#property> <http://localhost:8000/shapes#batterReadyPropertyShape>;
+  <http://www.w3.org/ns/shacl#targetClass> <https://schema.org/Thing> .
+
+<http://localhost:8000/shapes#batterReadyPropertyShape> a <http://www.w3.org/ns/shacl#PropertyShape>;
+  <http://www.w3.org/2000/01/rdf-schema#label> "TODO: provide a description";
+  <http://www.w3.org/ns/shacl#datatype> <http://www.w3.org/2001/XMLSchema#boolean>;
+  <http://www.w3.org/ns/shacl#maxCount> 1;
+  <http://www.w3.org/ns/shacl#minCount> 1;
+  <http://www.w3.org/ns/shacl#path> <http://example.com/ns#batterReady>;
+  <http://www.w3.org/ns/shacl#pattern> "true" .
+
+<http://localhost:8000/shapes#cakeReady> a <https://w3id.org/imec/ns/fno-steps#StateShape>;
+  <http://www.w3.org/2000/01/rdf-schema#label> "TODO: provide a description";
+  <http://www.w3.org/ns/shacl#property> <http://localhost:8000/shapes#cakeReadyPropertyShape>;
+  <http://www.w3.org/ns/shacl#targetClass> <https://schema.org/Thing> .
+
+<http://localhost:8000/shapes#cakeReadyPropertyShape> a <http://www.w3.org/ns/shacl#PropertyShape>;
+  <http://www.w3.org/2000/01/rdf-schema#label> "TODO: provide a description";
+  <http://www.w3.org/ns/shacl#datatype> <http://www.w3.org/2001/XMLSchema#boolean>;
+  <http://www.w3.org/ns/shacl#maxCount> 1;
+  <http://www.w3.org/ns/shacl#minCount> 1;
+  <http://www.w3.org/ns/shacl#path> <http://example.com/ns#cakeReady>;
+  <http://www.w3.org/ns/shacl#pattern> "true" .
+
+<http://localhost:8000/shapes#haveButter> a <https://w3id.org/imec/ns/fno-steps#StateShape>;
+  <http://www.w3.org/2000/01/rdf-schema#label> "TODO: provide a description";
+  <http://www.w3.org/ns/shacl#property> <http://localhost:8000/shapes#haveButterPropertyShape>;
+  <http://www.w3.org/ns/shacl#targetClass> <https://schema.org/Thing> .
+
+<http://localhost:8000/shapes#haveButterPropertyShape> a <http://www.w3.org/ns/shacl#PropertyShape>;
+  <http://www.w3.org/2000/01/rdf-schema#label> "TODO: provide a description";
+  <http://www.w3.org/ns/shacl#datatype> <http://www.w3.org/2001/XMLSchema#boolean>;
+  <http://www.w3.org/ns/shacl#maxCount> 1;
+  <http://www.w3.org/ns/shacl#minCount> 1;
+  <http://www.w3.org/ns/shacl#path> <http://example.com/ns#haveButter>;
+  <http://www.w3.org/ns/shacl#pattern> "true" .
+
+<http://localhost:8000/shapes#haveEggs> a <https://w3id.org/imec/ns/fno-steps#StateShape>;
+  <http://www.w3.org/2000/01/rdf-schema#label> "TODO: provide a description";
+  <http://www.w3.org/ns/shacl#property> <http://localhost:8000/shapes#haveEggsPropertyShape>;
+  <http://www.w3.org/ns/shacl#targetClass> <https://schema.org/Thing> .
+
+<http://localhost:8000/shapes#haveEggsPropertyShape> a <http://www.w3.org/ns/shacl#PropertyShape>;
+  <http://www.w3.org/2000/01/rdf-schema#label> "TODO: provide a description";
+  <http://www.w3.org/ns/shacl#datatype> <http://www.w3.org/2001/XMLSchema#boolean>;
+  <http://www.w3.org/ns/shacl#maxCount> 1;
+  <http://www.w3.org/ns/shacl#minCount> 1;
+  <http://www.w3.org/ns/shacl#path> <http://example.com/ns#haveEggs>;
+  <http://www.w3.org/ns/shacl#pattern> "true" .
+
+<http://localhost:8000/shapes#haveFlour> a <https://w3id.org/imec/ns/fno-steps#StateShape>;
+  <http://www.w3.org/2000/01/rdf-schema#label> "TODO: provide a description";
+  <http://www.w3.org/ns/shacl#property> <http://localhost:8000/shapes#haveFlourPropertyShape>;
+  <http://www.w3.org/ns/shacl#targetClass> <https://schema.org/Thing> .
+
+<http://localhost:8000/shapes#haveFlourPropertyShape> a <http://www.w3.org/ns/shacl#PropertyShape>;
+  <http://www.w3.org/2000/01/rdf-schema#label> "TODO: provide a description";
+  <http://www.w3.org/ns/shacl#datatype> <http://www.w3.org/2001/XMLSchema#boolean>;
+  <http://www.w3.org/ns/shacl#maxCount> 1;
+  <http://www.w3.org/ns/shacl#minCount> 1;
+  <http://www.w3.org/ns/shacl#path> <http://example.com/ns#haveFlour>;
+  <http://www.w3.org/ns/shacl#pattern> "true" .
+
+<http://localhost:8000/shapes#haveIngredients> a <https://w3id.org/imec/ns/fno-steps#StateShape>;
+  <http://www.w3.org/2000/01/rdf-schema#label> "TODO: provide a description";
+  <http://www.w3.org/ns/shacl#property> <http://localhost:8000/shapes#haveIngredientsPropertyShape>;
+  <http://www.w3.org/ns/shacl#targetClass> <https://schema.org/Thing> .
+
+<http://localhost:8000/shapes#haveIngredientsPropertyShape> a <http://www.w3.org/ns/shacl#PropertyShape>;
+  <http://www.w3.org/2000/01/rdf-schema#label> "TODO: provide a description";
+  <http://www.w3.org/ns/shacl#datatype> <http://www.w3.org/2001/XMLSchema#boolean>;
+  <http://www.w3.org/ns/shacl#maxCount> 1;
+  <http://www.w3.org/ns/shacl#minCount> 1;
+  <http://www.w3.org/ns/shacl#path> <http://example.com/ns#haveIngredients>;
+  <http://www.w3.org/ns/shacl#pattern> "true" .
+
+<http://localhost:8000/shapes#ingredientsMissing> a <https://w3id.org/imec/ns/fno-steps#StateShape>;
+  <http://www.w3.org/2000/01/rdf-schema#label> "TODO: provide a description";
+  <http://www.w3.org/ns/shacl#property> <http://localhost:8000/shapes#ingredientsMissingPropertyShape>;
+  <http://www.w3.org/ns/shacl#targetClass> <https://schema.org/Thing> .
+
+<http://localhost:8000/shapes#ingredientsMissingPropertyShape> a <http://www.w3.org/ns/shacl#PropertyShape>;
+  <http://www.w3.org/2000/01/rdf-schema#label> "TODO: provide a description";
+  <http://www.w3.org/ns/shacl#datatype> <http://www.w3.org/2001/XMLSchema#boolean>;
+  <http://www.w3.org/ns/shacl#maxCount> 1;
+  <http://www.w3.org/ns/shacl#minCount> 1;
+  <http://www.w3.org/ns/shacl#path> <http://example.com/ns#ingredientsMissing>;
+  <http://www.w3.org/ns/shacl#pattern> "true" .
+
+<http://localhost:8000/shapes#noIngredientsMissing> a <https://w3id.org/imec/ns/fno-steps#StateShape>;
+  <http://www.w3.org/2000/01/rdf-schema#label> "TODO: provide a description";
+  <http://www.w3.org/ns/shacl#property> <http://localhost:8000/shapes#noIngredientsMissingPropertyShape>;
+  <http://www.w3.org/ns/shacl#targetClass> <https://schema.org/Thing> .
+
+<http://localhost:8000/shapes#noIngredientsMissingPropertyShape> a <http://www.w3.org/ns/shacl#PropertyShape>;
+  <http://www.w3.org/2000/01/rdf-schema#label> "TODO: provide a description";
+  <http://www.w3.org/ns/shacl#datatype> <http://www.w3.org/2001/XMLSchema#boolean>;
+  <http://www.w3.org/ns/shacl#maxCount> 1;
+  <http://www.w3.org/ns/shacl#minCount> 1;
+  <http://www.w3.org/ns/shacl#path> <http://example.com/ns#noIngredientsMissing>;
+  <http://www.w3.org/ns/shacl#pattern> "true" .
+
+<http://localhost:8000/shapes#readyForBaking> a <https://w3id.org/imec/ns/fno-steps#StateShape>;
+  <http://www.w3.org/2000/01/rdf-schema#label> "TODO: provide a description";
+  <http://www.w3.org/ns/shacl#property> <http://localhost:8000/shapes#readyForBakingPropertyShape>;
+  <http://www.w3.org/ns/shacl#targetClass> <https://schema.org/Thing> .
+
+<http://localhost:8000/shapes#readyForBakingPropertyShape> a <http://www.w3.org/ns/shacl#PropertyShape>;
+  <http://www.w3.org/2000/01/rdf-schema#label> "TODO: provide a description";
+  <http://www.w3.org/ns/shacl#datatype> <http://www.w3.org/2001/XMLSchema#boolean>;
+  <http://www.w3.org/ns/shacl#maxCount> 1;
+  <http://www.w3.org/ns/shacl#minCount> 1;
+  <http://www.w3.org/ns/shacl#path> <http://example.com/ns#readyForBaking>;
+  <http://www.w3.org/ns/shacl#pattern> "true" .

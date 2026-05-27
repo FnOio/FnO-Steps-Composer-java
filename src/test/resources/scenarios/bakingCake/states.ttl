@@ -1,0 +1,40 @@
+
+<http://localhost:8000/states#baking> a <https://w3id.org/imec/ns/fno-steps#State>;
+  <http://www.w3.org/2000/01/rdf-schema#label> "";
+  <https://w3id.org/imec/ns/fno-steps#hasStateShape> <http://localhost:8000/shapes#baking> .
+
+<http://localhost:8000/states#batterReady> a <https://w3id.org/imec/ns/fno-steps#State>;
+  <http://www.w3.org/2000/01/rdf-schema#label> "";
+  <https://w3id.org/imec/ns/fno-steps#hasStateShape> <http://localhost:8000/shapes#batterReady> .
+
+<http://localhost:8000/states#cakeReady> a <https://w3id.org/imec/ns/fno-steps#State>;
+  <http://www.w3.org/2000/01/rdf-schema#label> "";
+  <https://w3id.org/imec/ns/fno-steps#hasStateShape> <http://localhost:8000/shapes#cakeReady> .
+
+<http://localhost:8000/states#haveButter> a <https://w3id.org/imec/ns/fno-steps#State>;
+  <http://www.w3.org/2000/01/rdf-schema#label> "";
+  <https://w3id.org/imec/ns/fno-steps#hasStateShape> <http://localhost:8000/shapes#haveButter> .
+
+<http://localhost:8000/states#haveEggs> a <https://w3id.org/imec/ns/fno-steps#State>;
+  <http://www.w3.org/2000/01/rdf-schema#label> "";
+  <https://w3id.org/imec/ns/fno-steps#hasStateShape> <http://localhost:8000/shapes#haveEggs> .
+
+<http://localhost:8000/states#haveFlour> a <https://w3id.org/imec/ns/fno-steps#State>;
+  <http://www.w3.org/2000/01/rdf-schema#label> "";
+  <https://w3id.org/imec/ns/fno-steps#hasStateShape> <http://localhost:8000/shapes#haveFlour> .
+
+<http://localhost:8000/states#haveIngredients> a <https://w3id.org/imec/ns/fno-steps#State>;
+  <http://www.w3.org/2000/01/rdf-schema#label> "";
+  <https://w3id.org/imec/ns/fno-steps#hasStateShape> <http://localhost:8000/shapes#haveIngredients> .
+
+<http://localhost:8000/states#ingredientsMissing> a <https://w3id.org/imec/ns/fno-steps#State>;
+  <http://www.w3.org/2000/01/rdf-schema#label> "";
+  <https://w3id.org/imec/ns/fno-steps#hasStateShape> <http://localhost:8000/shapes#ingredientsMissing> .
+
+<http://localhost:8000/states#noIngredientsMissing> a <https://w3id.org/imec/ns/fno-steps#State>;
+  <http://www.w3.org/2000/01/rdf-schema#label> "";
+  <https://w3id.org/imec/ns/fno-steps#hasStateShape> <http://localhost:8000/shapes#noIngredientsMissing> .
+
+<http://localhost:8000/states#readyForBaking> a <https://w3id.org/imec/ns/fno-steps#State>;
+  <http://www.w3.org/2000/01/rdf-schema#label> "";
+  <https://w3id.org/imec/ns/fno-steps#hasStateShape> <http://localhost:8000/shapes#readyForBaking> .

@@ -1,0 +1,422 @@
+@prefix rr: <http://www.w3.org/ns/r2rml#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix fnml: <http://semweb.mmlab.be/ns/fnml#> .
+@prefix fno: <https://w3id.org/function/ontology#> .
+@prefix d2rq: <http://www.wiwiss.fu-berlin.de/suhl/bizer/D2RQ/0.1#> .
+@prefix void: <http://rdfs.org/ns/void#> .
+@prefix dc: <http://purl.org/dc/terms/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix rml: <http://semweb.mmlab.be/ns/rml#> .
+@prefix ql: <http://semweb.mmlab.be/ns/ql#> .
+@prefix : <http://mapping.example.com/> .
+@prefix ex: <http://example.com/ns#> .
+@prefix fno-steps: <https://w3id.org/imec/ns/fno-steps#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix schema: <https://schema.org/> .
+@prefix xl: <http://www.w3.org/2008/05/skos-xl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix grel: <http://users.ugent.be/~bjdmeest/function/grel.ttl#> .
+@prefix idlab-fn: <https://w3id.org/imec/idlab/function#> .
+@prefix rmlt: <http://semweb.mmlab.be/ns/rml-target#> .
+@prefix formats: <http://www.w3.org/ns/formats/> .
+
+:source_000 rdf:type rml:LogicalSource ;
+	rdfs:label "shapes-source" ;
+	rml:source "/mnt/data//out/shapes.csv" ;
+	rml:referenceFormulation ql:CSV .
+
+:source_001 rdf:type rml:LogicalSource ;
+	rdfs:label "states-source" ;
+	rml:source "/mnt/data//out/states.csv" ;
+	rml:referenceFormulation ql:CSV .
+
+:source_002 rdf:type rml:LogicalSource ;
+	rdfs:label "steps-source" ;
+	rml:source "/mnt/data//out/steps.json" ;
+	rml:iterator "$[*]" ;
+	rml:referenceFormulation ql:JSONPath .
+
+:target_000 rdf:type rmlt:LogicalTarget ;
+	rdfs:label "shapes-target" ;
+	rmlt:serialization formats:Turtle ;
+	rmlt:target :void_000 .
+
+:void_000 rdf:type void:Dataset ;
+	void:dataDump <file:///mnt/data//out/shapes.ttl> .
+
+:target_001 rdf:type rmlt:LogicalTarget ;
+	rdfs:label "states-target" ;
+	rmlt:serialization formats:Turtle ;
+	rmlt:target :void_001 .
+
+:void_001 rdf:type void:Dataset ;
+	void:dataDump <file:///mnt/data//out/states.ttl> .
+
+:target_002 rdf:type rmlt:LogicalTarget ;
+	rdfs:label "steps-target" ;
+	rmlt:serialization formats:Turtle ;
+	rmlt:target :void_002 .
+
+:void_002 rdf:type void:Dataset ;
+	void:dataDump <file:///mnt/data//out/steps.ttl> .
+
+:map_shape_000 rml:logicalSource :source_000 ;
+	rdf:type rr:TriplesMap ;
+	rdfs:label "shape" ;
+	rr:subjectMap :s_000 ;
+	rr:predicateObjectMap :pom_000, :pom_001, :pom_002, :pom_003 .
+
+:s_000 rdf:type rr:SubjectMap ;
+	rr:template "http://localhost:8000/shapes#{name}" ;
+	rml:logicalTarget :target_000 .
+
+:pom_000 rdf:type rr:PredicateObjectMap ;
+	rr:predicateMap :pm_000 ;
+	rr:objectMap :om_000 .
+
+:pm_000 rdf:type rr:PredicateMap ;
+	rr:constant rdf:type .
+
+:om_000 rdf:type rr:ObjectMap ;
+	rr:constant fno-steps:StateShape ;
+	rr:termType rr:IRI .
+
+:pom_001 rdf:type rr:PredicateObjectMap ;
+	rr:predicateMap :pm_001 ;
+	rr:objectMap :om_001 .
+
+:pm_001 rdf:type rr:PredicateMap ;
+	rr:constant rdfs:label .
+
+:om_001 rdf:type rr:ObjectMap ;
+	rr:constant "TODO: provide a description" ;
+	rr:termType rr:Literal .
+
+:pom_002 rdf:type rr:PredicateObjectMap ;
+	rr:predicateMap :pm_002 ;
+	rr:objectMap :om_002 .
+
+:pm_002 rdf:type rr:PredicateMap ;
+	rr:constant sh:targetClass .
+
+:om_002 rdf:type rr:ObjectMap ;
+	rr:constant schema:Thing ;
+	rr:termType rr:IRI .
+
+:pom_003 rdf:type rr:PredicateObjectMap ;
+	rr:predicateMap :pm_003 ;
+	rr:objectMap :om_022 .
+
+:pm_003 rdf:type rr:PredicateMap ;
+	rr:constant sh:property .
+
+:map_propertyShape_000 rml:logicalSource :source_000 ;
+	rdf:type rr:TriplesMap ;
+	rdfs:label "propertyShape" ;
+	rr:subjectMap :s_001 ;
+	rr:predicateObjectMap :pom_004, :pom_005, :pom_006, :pom_007, :pom_008, :pom_009, :pom_010 .
+
+:s_001 rdf:type rr:SubjectMap ;
+	rr:template "http://localhost:8000/shapes#{name}PropertyShape" ;
+	rml:logicalTarget :target_000 .
+
+:pom_004 rdf:type rr:PredicateObjectMap ;
+	rr:predicateMap :pm_004 ;
+	rr:objectMap :om_003 .
+
+:pm_004 rdf:type rr:PredicateMap ;
+	rr:constant rdf:type .
+
+:om_003 rdf:type rr:ObjectMap ;
+	rr:constant sh:PropertyShape ;
+	rr:termType rr:IRI .
+
+:pom_005 rdf:type rr:PredicateObjectMap ;
+	rr:predicateMap :pm_005 ;
+	rr:objectMap :om_004 .
+
+:pm_005 rdf:type rr:PredicateMap ;
+	rr:constant rdfs:label .
+
+:om_004 rdf:type rr:ObjectMap ;
+	rr:constant "TODO: provide a description" ;
+	rr:termType rr:Literal .
+
+:pom_006 rdf:type rr:PredicateObjectMap ;
+	rr:predicateMap :pm_006 ;
+	rr:objectMap :om_005 .
+
+:pm_006 rdf:type rr:PredicateMap ;
+	rr:constant sh:path .
+
+:om_005 rdf:type rr:ObjectMap ;
+	rr:template "http://example.com/ns#{name}" ;
+	rr:termType rr:IRI .
+
+:pom_007 rdf:type rr:PredicateObjectMap ;
+	rr:predicateMap :pm_007 ;
+	rr:objectMap :om_006 .
+
+:pm_007 rdf:type rr:PredicateMap ;
+	rr:constant sh:datatype .
+
+:om_006 rdf:type rr:ObjectMap ;
+	rr:constant xsd:boolean ;
+	rr:termType rr:IRI .
+
+:pom_008 rdf:type rr:PredicateObjectMap ;
+	rr:predicateMap :pm_008 ;
+	rr:objectMap :om_007 .
+
+:pm_008 rdf:type rr:PredicateMap ;
+	rr:constant sh:minCount .
+
+:om_007 rdf:type rr:ObjectMap ;
+	rr:constant "1" ;
+	rr:termType rr:Literal ;
+	rr:datatype xsd:integer .
+
+:pom_009 rdf:type rr:PredicateObjectMap ;
+	rr:predicateMap :pm_009 ;
+	rr:objectMap :om_008 .
+
+:pm_009 rdf:type rr:PredicateMap ;
+	rr:constant sh:maxCount .
+
+:om_008 rdf:type rr:ObjectMap ;
+	rr:constant "1" ;
+	rr:termType rr:Literal ;
+	rr:datatype xsd:integer .
+
+:pom_010 rdf:type rr:PredicateObjectMap ;
+	rr:predicateMap :pm_010 ;
+	rr:objectMap :om_009 .
+
+:pm_010 rdf:type rr:PredicateMap ;
+	rr:constant sh:pattern .
+
+:om_009 rdf:type rr:ObjectMap ;
+	rr:constant "true" ;
+	rr:termType rr:Literal .
+
+:map_states_000 rml:logicalSource :source_001 ;
+	rdf:type rr:TriplesMap ;
+	rdfs:label "states" ;
+	rr:subjectMap :s_002 ;
+	rr:predicateObjectMap :pom_011, :pom_012, :pom_013 .
+
+:s_002 rdf:type rr:SubjectMap ;
+	rr:template "http://localhost:8000/states#{name}" ;
+	rml:logicalTarget :target_001 .
+
+:pom_011 rdf:type rr:PredicateObjectMap ;
+	rr:predicateMap :pm_011 ;
+	rr:objectMap :om_010 .
+
+:pm_011 rdf:type rr:PredicateMap ;
+	rr:constant rdf:type .
+
+:om_010 rdf:type rr:ObjectMap ;
+	rr:constant fno-steps:State ;
+	rr:termType rr:IRI .
+
+:pom_012 rdf:type rr:PredicateObjectMap ;
+	rr:predicateMap :pm_012 ;
+	rr:objectMap :om_011 .
+
+:pm_012 rdf:type rr:PredicateMap ;
+	rr:constant rdfs:label .
+
+:om_011 rdf:type rr:ObjectMap ;
+	rml:reference "description" ;
+	rr:termType rr:Literal .
+
+:pom_013 rdf:type rr:PredicateObjectMap ;
+	rr:predicateMap :pm_013 ;
+	rr:objectMap :om_023 .
+
+:pm_013 rdf:type rr:PredicateMap ;
+	rr:constant fno-steps:hasStateShape .
+
+:map_steps_000 rml:logicalSource :source_002 ;
+	rdf:type rr:TriplesMap ;
+	rdfs:label "steps" ;
+	rr:subjectMap :s_003 ;
+	rr:predicateObjectMap :pom_014, :pom_015, :pom_016, :pom_017, :pom_023 .
+
+:s_003 rdf:type rr:SubjectMap ;
+	rr:template "http://localhost:8000/steps#{name}" ;
+	rml:logicalTarget :target_002 .
+
+:pom_014 rdf:type rr:PredicateObjectMap ;
+	rr:predicateMap :pm_014 ;
+	rr:objectMap :om_012 .
+
+:pm_014 rdf:type rr:PredicateMap ;
+	rr:constant rdf:type .
+
+:om_012 rdf:type rr:ObjectMap ;
+	rr:template "https://w3id.org/imec/ns/fno-steps#{levels}LevelStep" ;
+	rr:termType rr:IRI .
+
+:pom_015 rdf:type rr:PredicateObjectMap ;
+	rr:predicateMap :pm_015 ;
+	rr:objectMap :om_024 .
+
+:pm_015 rdf:type rr:PredicateMap ;
+	rr:constant fno-steps:hasDescription .
+
+:pom_016 rdf:type rr:PredicateObjectMap ;
+	rr:predicateMap :pm_016 ;
+	rr:objectMap :om_013 .
+
+:pm_016 rdf:type rr:PredicateMap ;
+	rr:constant fno-steps:requiresState .
+
+:om_013 rdf:type rr:ObjectMap ;
+	rr:template "http://localhost:8000/states#{start_states}" ;
+	rr:termType rr:IRI .
+
+:pom_017 rdf:type rr:PredicateObjectMap ;
+	rr:predicateMap :pm_017 ;
+	rr:objectMap :om_014 .
+
+:pm_017 rdf:type rr:PredicateMap ;
+	rr:constant fno-steps:requiresState .
+
+:om_014 rdf:type fnml:FunctionTermMap ;
+	rr:termType rr:IRI ;
+	fnml:functionValue :fn_000 .
+
+:fn_000 rml:logicalSource :source_002 ;
+	rr:predicateObjectMap :pomexec_000, :pom_018, :pom_022 .
+
+:pomexec_000 rr:predicateMap :pmexec_000 ;
+	rr:objectMap :omexec_000 .
+
+:pmexec_000 rr:constant fno:executes .
+
+:omexec_000 rr:constant "https://w3id.org/imec/idlab/function#trueCondition" ;
+	rr:termType rr:IRI .
+
+:pom_018 rdf:type rr:PredicateObjectMap ;
+	rr:predicateMap :pm_018 ;
+	rr:objectMap :om_015 .
+
+:pm_018 rdf:type rr:PredicateMap ;
+	rr:constant idlab-fn:strBoolean .
+
+:om_015 rdf:type rr:ObjectMap, fnml:FunctionTermMap ;
+	fnml:functionValue :fn_001 .
+
+:fn_001 rml:logicalSource :source_002 ;
+	rr:predicateObjectMap :pomexec_001, :pom_019, :pom_020 .
+
+:pomexec_001 rr:predicateMap :pmexec_001 ;
+	rr:objectMap :omexec_001 .
+
+:pmexec_001 rr:constant fno:executes .
+
+:omexec_001 rr:constant "https://w3id.org/imec/idlab/function#equal" ;
+	rr:termType rr:IRI .
+
+:pom_019 rdf:type rr:PredicateObjectMap ;
+	rr:predicateMap :pm_019 ;
+	rr:objectMap :om_016 .
+
+:pm_019 rdf:type rr:PredicateMap ;
+	rr:constant grel:valueParameter .
+
+:om_016 rdf:type rr:ObjectMap ;
+	rr:constant "0" ;
+	rr:termType rr:Literal .
+
+:pom_020 rdf:type rr:PredicateObjectMap ;
+	rr:predicateMap :pm_020 ;
+	rr:objectMap :om_017 .
+
+:pm_020 rdf:type rr:PredicateMap ;
+	rr:constant grel:valueParameter2 .
+
+:om_017 rdf:type rr:ObjectMap, fnml:FunctionTermMap ;
+	fnml:functionValue :fn_002 .
+
+:fn_002 rml:logicalSource :source_002 ;
+	rr:predicateObjectMap :pomexec_002, :pom_021 .
+
+:pomexec_002 rr:predicateMap :pmexec_002 ;
+	rr:objectMap :omexec_002 .
+
+:pmexec_002 rr:constant fno:executes .
+
+:omexec_002 rr:constant "http://users.ugent.be/~bjdmeest/function/grel.ttl#array_length" ;
+	rr:termType rr:IRI .
+
+:pom_021 rdf:type rr:PredicateObjectMap ;
+	rr:predicateMap :pm_021 ;
+	rr:objectMap :om_018 .
+
+:pm_021 rdf:type rr:PredicateMap ;
+	rr:constant grel:p_array_a .
+
+:om_018 rdf:type rr:ObjectMap ;
+	rml:reference "start_states" ;
+	rr:termType rr:Literal .
+
+:pom_022 rdf:type rr:PredicateObjectMap ;
+	rr:predicateMap :pm_022 ;
+	rr:objectMap :om_019 .
+
+:pm_022 rdf:type rr:PredicateMap ;
+	rr:constant idlab-fn:str .
+
+:om_019 rdf:type rr:ObjectMap ;
+	rr:constant "https://w3id.org/imec/ns/fno-steps#emptyState" ;
+	rr:termType rr:IRI .
+
+:pom_023 rdf:type rr:PredicateObjectMap ;
+	rr:predicateMap :pm_023 ;
+	rr:objectMap :om_020 .
+
+:pm_023 rdf:type rr:PredicateMap ;
+	rr:constant fno-steps:producesState .
+
+:om_020 rdf:type rr:ObjectMap ;
+	rr:template "http://localhost:8000/states#{end_states}" ;
+	rr:termType rr:IRI .
+
+:map_stepsDescriptions_000 rml:logicalSource :source_002 ;
+	rdf:type rr:TriplesMap ;
+	rdfs:label "stepsDescriptions" ;
+	rr:subjectMap :s_004 ;
+	rr:predicateObjectMap :pom_024 .
+
+:s_004 rdf:type rr:SubjectMap ;
+	rr:template "http://localhost:8000/steps#{name}Description" ;
+	rml:logicalTarget :target_002 .
+
+:pom_024 rdf:type rr:PredicateObjectMap ;
+	rr:predicateMap :pm_024 ;
+	rr:objectMap :om_021 .
+
+:pm_024 rdf:type rr:PredicateMap ;
+	rr:constant xl:literalForm .
+
+:om_021 rdf:type rr:ObjectMap ;
+	rml:reference "description" ;
+	rr:termType rr:Literal .
+
+:om_022 rdf:type rr:ObjectMap ;
+	rr:parentTriplesMap :map_propertyShape_000 .
+
+:om_023 rdf:type rr:ObjectMap ;
+	rr:parentTriplesMap :map_shape_000 ;
+	rr:joinCondition :jc_000 .
+
+:jc_000 rr:parent "name" ;
+	rr:child "shape" .
+
+:om_024 rdf:type rr:ObjectMap ;
+	rr:parentTriplesMap :map_stepsDescriptions_000 .
+

@@ -92,3 +92,6 @@ stepsWait/
 - `shapes.ttl`: The shapes that define a state. If the data complies to a shape, the flow is in the state that requires the shape.
 - `states.ttl`: The possible states in this flow. A state lists required shapes.
 - `steps.ttl`: The possible steps in this flow. A step lists required states, and which state(s) it produces.
+
+## Tutorial
+- how to bake cake using the workflow composer [doc](tutorial.md)

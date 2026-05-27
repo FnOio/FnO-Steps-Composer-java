@@ -1,0 +1,33 @@
+---
+title: Baking cake
+---
+stateDiagram-v2
+    state ingredientsCheck <<choice>>
+
+    [*] --> ingredientsCheck : check_ingredients | Check if all ingredients are there
+
+    ingredientsCheck --> ingredientsMissing : ingredients_missing | We have no ingredients
+
+    state buyFork <<fork>>
+
+    ingredientsMissing --> buyFork
+    buyFork --> haveEggs : buy_eggs | Buy eggs
+    buyFork --> haveButter : buy_butter | Buy butter
+    buyFork --> haveFlour : buy_flour | Buy flour
+
+    state haveIngredientsJoin <<join>>
+    haveEggs --> haveIngredientsJoin
+    haveButter --> haveIngredientsJoin
+    haveFlour --> haveIngredientsJoin
+
+    haveIngredientsJoin --> haveIngredients: have_ingredients | Now we have all ingredients
+
+    haveIngredients --> readyForBaking: go_home | Go home and get ready to bake
+
+    ingredientsCheck --> noIngredientsMissing : ok | All ingredients are there
+    noIngredientsMissing --> readyForBaking : start | Start baking
+    readyForBaking --> batterReady : follow_recipe | Follow the recipe
+
+    batterReady --> baking : put_in_oven | Put in the oven
+    baking --> cakeReady : wait_for_1_hour | Wait for one hour
+    cakeReady --> [*]

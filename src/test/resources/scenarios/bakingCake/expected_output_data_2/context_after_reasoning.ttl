@@ -1,0 +1,6 @@
+PREFIX : <http://example.com/ns#>
+PREFIX schema: <https://schema.org/>
+PREFIX ex: <http://example.com/ns#>
+
+:me a schema:Thing ;
+    ex:ingredientsMissing true .

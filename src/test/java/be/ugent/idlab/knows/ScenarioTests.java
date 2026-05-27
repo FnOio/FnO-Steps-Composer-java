@@ -62,7 +62,14 @@ public class ScenarioTests {
                 // Add some N3 reasoning in the mix, comparing timestamps.
                 Arguments.of("stepsWait", "data_01_start.ttl"),
                 Arguments.of("stepsWait", "data_02_at_traffic_light.ttl"),
-                Arguments.of("stepsWait", "data_03_light_is_green.ttl")
+                Arguments.of("stepsWait", "data_03_light_is_green.ttl"),
+
+                // Baking cake tutorial tests
+                Arguments.of("bakingCake", "data_1.ttl"),
+                Arguments.of("bakingCake", "data_2.ttl"),
+                Arguments.of("bakingCake", "data_3.ttl"),
+                Arguments.of("bakingCake", "data_4_1_before_wait.ttl"),
+                Arguments.of("bakingCake", "data_4_2_after_wait.ttl")
 
         );
     }
@@ -98,7 +105,7 @@ public class ScenarioTests {
                     // compare graphs
                     Graph expectedGraph = RDFDataMgr.loadGraph(expectedOutputFile.toString(), Lang.TURTLE);
                     Graph actualGraph = RDFDataMgr.loadGraph(actualOutputFile.toString(), Lang.TURTLE);
-                    assertTrue(expectedGraph.isIsomorphicWith(actualGraph));
+                    assertTrue(expectedGraph.isIsomorphicWith(actualGraph), "The file " + fileName + " does not contain the expected graph.");
                 } else if (fileName.endsWith(".mmd")) {
                     // compare Mermaid diagrams; exact comparison for now...
                     String expected = Files.readString(expectedOutputFile, StandardCharsets.UTF_8);

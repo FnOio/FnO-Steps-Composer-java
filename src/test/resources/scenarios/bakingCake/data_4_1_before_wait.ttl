@@ -1,0 +1,16 @@
+PREFIX : <http://example.com/ns#>
+PREFIX schema: <https://schema.org/>
+
+:me a schema:Thing ;
+    :haveFlour true ;
+    :haveButter true ;
+    :haveEggs true ;
+    :haveIngredients true ;
+    :haveIngredientsCake true ;
+    :readyForBaking true ;
+    :batterReady true ;
+    :baking true .
+
+# The timer is started at the moment we start baking. It's set to 1 hour.
+:timer a :Timer ;
+    :timerDuration 60 .

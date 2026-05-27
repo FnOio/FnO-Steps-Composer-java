@@ -1,0 +1,195 @@
+[
+  {
+    "name": "container_journey_step_[START_STATE]-[readyForBaking]",
+    "description": null,
+    "levels": [
+      "Container",
+      "Journey"
+    ],
+    "start_states": [],
+    "end_states": [
+      "readyForBaking"
+    ]
+  },
+  {
+    "name": "buy_flour",
+    "description": "Buy flour",
+    "levels": [
+      "Component"
+    ],
+    "start_states": [
+      "ingredientsMissing"
+    ],
+    "end_states": [
+      "haveFlour"
+    ]
+  },
+  {
+    "name": "put_in_oven",
+    "description": "Put in the oven",
+    "levels": [
+      "Component"
+    ],
+    "start_states": [
+      "batterReady"
+    ],
+    "end_states": [
+      "baking"
+    ]
+  },
+  {
+    "name": "buy_eggs",
+    "description": "Buy eggs",
+    "levels": [
+      "Component"
+    ],
+    "start_states": [
+      "ingredientsMissing"
+    ],
+    "end_states": [
+      "haveEggs"
+    ]
+  },
+  {
+    "name": "go_home",
+    "description": "Go home and get ready to bake",
+    "levels": [
+      "Component"
+    ],
+    "start_states": [
+      "haveIngredients"
+    ],
+    "end_states": [
+      "readyForBaking"
+    ]
+  },
+  {
+    "name": "container_journey_step_[START_STATE]-[ingredientsMissing]",
+    "description": null,
+    "levels": [
+      "Container",
+      "Journey"
+    ],
+    "start_states": [],
+    "end_states": [
+      "ingredientsMissing"
+    ]
+  },
+  {
+    "name": "container_journey_step_[haveIngredients]-[cakeReady]",
+    "description": null,
+    "levels": [
+      "Container",
+      "Journey"
+    ],
+    "start_states": [
+      "haveIngredients"
+    ],
+    "end_states": [
+      "cakeReady"
+    ]
+  },
+  {
+    "name": "wait_for_1_hour",
+    "description": "Wait for one hour",
+    "levels": [
+      "Component"
+    ],
+    "start_states": [
+      "baking"
+    ],
+    "end_states": [
+      "cakeReady"
+    ]
+  },
+  {
+    "name": "ingredients_missing",
+    "description": "We have no ingredients",
+    "levels": [
+      "Component"
+    ],
+    "start_states": [],
+    "end_states": [
+      "ingredientsMissing"
+    ]
+  },
+  {
+    "name": "container_journey_step_[ingredientsMissing]-[haveIngredients]",
+    "description": null,
+    "levels": [
+      "Journey",
+      "Container"
+    ],
+    "start_states": [
+      "ingredientsMissing"
+    ],
+    "end_states": [
+      "haveIngredients"
+    ]
+  },
+  {
+    "name": "follow_recipe",
+    "description": "Follow the recipe",
+    "levels": [
+      "Component"
+    ],
+    "start_states": [
+      "readyForBaking"
+    ],
+    "end_states": [
+      "batterReady"
+    ]
+  },
+  {
+    "name": "have_ingredients",
+    "description": "Now we have all ingredients",
+    "levels": [
+      "Component"
+    ],
+    "start_states": [
+      "haveButter",
+      "haveEggs",
+      "haveFlour"
+    ],
+    "end_states": [
+      "haveIngredients"
+    ]
+  },
+  {
+    "name": "ok",
+    "description": "All ingredients are there",
+    "levels": [
+      "Component"
+    ],
+    "start_states": [],
+    "end_states": [
+      "noIngredientsMissing"
+    ]
+  },
+  {
+    "name": "buy_butter",
+    "description": "Buy butter",
+    "levels": [
+      "Component"
+    ],
+    "start_states": [
+      "ingredientsMissing"
+    ],
+    "end_states": [
+      "haveButter"
+    ]
+  },
+  {
+    "name": "start",
+    "description": "Start baking",
+    "levels": [
+      "Component"
+    ],
+    "start_states": [
+      "noIngredientsMissing"
+    ],
+    "end_states": [
+      "readyForBaking"
+    ]
+  }
+]

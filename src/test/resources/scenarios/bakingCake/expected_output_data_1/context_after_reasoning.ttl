@@ -1,0 +1,4 @@
+PREFIX : <http://example.com/ns#>
+PREFIX schema: <https://schema.org/>
+
+:me a schema:Thing .    # True in a certain way; this is the default generated target class. Can be overridden by providing different mappings.

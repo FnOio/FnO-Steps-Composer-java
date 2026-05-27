@@ -1,0 +1,14 @@
+PREFIX : <http://example.com/ns#>
+PREFIX schema: <https://schema.org/>
+
+# Has the timer reached 0 minutes?
+{
+    ?timer a :Timer .
+    ?timer :timerDuration 0 .
+    ?baker a schema:Thing .
+}
+=>
+{
+    ?timer :isFinished true .
+    ?baker :cakeReady true .
+} .
